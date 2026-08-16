@@ -5,6 +5,8 @@ from .llm_interface import GenerationClient, GenerationResponse, Message, Provid
 from typing import Any, Optional
 import os
 from src.Utils import settings
+from pydantic_settings import BaseModel
+
 
 class CohereClient(GenerationClient):
     """Wraps Cohere's chat API (ClientV2 / async)."""
@@ -27,17 +29,27 @@ class CohereClient(GenerationClient):
         messages: list[Message],
         temperature: float = 0.3,
         max_tokens: int = 1024,
+        output_schema: type[BaseModel] | None = None,
         **kwargs: Any,
     ) -> GenerationResponse:
         try:
             cohere_messages = [{"role": m.role, "content": m.content} for m in messages]
-            resp = await self._client.chat(
-                model=self.model,
-                messages=cohere_messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                **kwargs,
-            )
+
+            chat_kwargs = {
+            "model": self.model,
+            "messages": cohere_messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            **kwargs,
+            }
+
+            if output_schema is not None:
+                chat_kwargs["response_format"] = {
+                    "type": "json_object",
+                    "json_schema": output_schema.model_json_schema(),
+                }
+
+            resp = await self._client.chat(**chat_kwargs)
             text = "".join(
                 block.text for block in resp.message.content if block.type == "text"
             )

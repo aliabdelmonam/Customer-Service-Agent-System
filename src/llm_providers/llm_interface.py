@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional
-
+from pydantic_settings import BaseModel
 
 # ---------------------------------------------------------------------------
 # Shared types
@@ -58,6 +58,7 @@ class GenerationClient(ABC):
         messages: list[Message],
         temperature: float = 0.3,
         max_tokens: int = 1024,
+        output_schema: type[BaseModel] | None = None,
         **kwargs: Any,
     ) -> GenerationResponse:
         """Send messages, return a normalized GenerationResponse."""

@@ -4,6 +4,8 @@
 from .llm_interface import GenerationClient, GenerationResponse, Message, ProviderError, Provider
 from typing import Any
 from src.Utils import settings
+from pydantic_settings import BaseModel
+
 
 class GroqClient(GenerationClient):
     """Wraps Groq's API, which is OpenAI-compatible — reuses the
@@ -27,17 +29,31 @@ class GroqClient(GenerationClient):
         messages: list[Message],
         temperature: float = 0.3,
         max_tokens: int = 1024,
+        output_schema: type[BaseModel] | None = None,
         **kwargs: Any,
     ) -> GenerationResponse:
         try:
             openai_messages = [{"role": m.role, "content": m.content} for m in messages]
-            resp = await self._client.chat.completions.create(
-                model=self.model,
-                messages=openai_messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                **kwargs,
-            )
+
+            request_params: dict[str, Any] = {
+            "model": self.model,
+            "messages": openai_messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            **kwargs,
+        }
+
+            # Inject JSON schema into Groq / OpenAI response_format if provided
+            if output_schema is not None:
+                request_params["response_format"] = {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": output_schema.__name__,
+                        "schema": output_schema.model_json_schema(),
+                    },
+                }
+
+            resp = await self._client.chat.completions.create(**request_params)
             choice = resp.choices[0]
             usage = {}
             if resp.usage:
