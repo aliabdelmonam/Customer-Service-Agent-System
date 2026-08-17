@@ -1,23 +1,30 @@
-"""Provider-agnostic customer-service triage agent.
+"""Triage agent — now merged with the chitchat gate into a single LLM call.
 
-The agent depends only on the project's GenerationClient interface. It does not
-use LangChain or provider-specific SDKs. Structured output is requested through
-`response_format`, which is supported directly by the Cohere provider shown in
-this project.
+Previously this was two calls per turn (chitchat_gate.classify, then
+triage.classify). Since both are narrow structured-output classifications
+with no decision-making, they're combined into one schema and one call:
+the model first states whether there's an actionable request, and only
+fills in flow/subflow if there is. chitchat_gate.py's classification logic
+is superseded by this file; its canned-response templates are reused here
+unchanged.
+
+Cost note: this call is still small (few output fields, low max_tokens) --
+same model-swap-later story as before applies to the whole thing now,
+not just the taxonomy part.
 """
 
 from __future__ import annotations
 
-import json
-from typing import Optional, Any,Literal
+from enum import Enum
+from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, ConfigDict, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from src.llm_providers import GenerationClient, Message, ProviderError
 
 
 # ---------------------------------------------------------------------------
-# Taxonomy
+# Taxonomy (unchanged)
 # ---------------------------------------------------------------------------
 
 FLOW_SUBFLOWS: dict[str, list[str]] = {
@@ -120,57 +127,82 @@ SUBFLOW_DESCRIPTIONS: dict[str, str] = {
     "Policy FAQ": "General question about store policies, such as returns or shipping.",
 }
 
-
-# ---------------------------------------------------------------------------
-# Structured output
-# ---------------------------------------------------------------------------
 _ALL_FLOWS = tuple(FLOW_SUBFLOWS.keys())
 _ALL_SUBFLOWS = tuple({sf for subs in FLOW_SUBFLOWS.values() for sf in subs})
 
-class TriageResult(BaseModel):
-    """Validated result returned by the triage node."""
 
+# ---------------------------------------------------------------------------
+# Chitchat categories (absorbed from chitchat_gate.py)
+# ---------------------------------------------------------------------------
+
+class ChitchatType(str, Enum):
+    GREETING = "greeting"
+    FAREWELL = "farewell"
+    THANKS = "thanks"
+    SMALL_TALK = "small_talk"
+    NONE = "none"  # no chitchat framing present
+
+
+_CANNED_RESPONSES: dict[ChitchatType, str] = {
+    ChitchatType.GREETING: "Hi there! How can I help you today?",
+    ChitchatType.FAREWELL: "Take care! Reach out anytime if you need anything else.",
+    ChitchatType.THANKS: "You're welcome! Let me know if there's anything else I can help with.",
+    ChitchatType.SMALL_TALK: "Happy to chat, but let me know if there's something I can help you with today!",
+}
+_DEFAULT_CANNED_RESPONSE = "How can I help you today?"
+
+
+# ---------------------------------------------------------------------------
+# Combined structured output
+# ---------------------------------------------------------------------------
+
+class TriageResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    flow: Optional[Literal[_ALL_FLOWS]] = Field(
-        default=None,
-        description="Exact flow from the allowed taxonomy",
+    has_actionable_request: bool = Field(
+        description="True if the message contains any real customer-service request, "
+                     "even alongside a greeting/thanks/farewell.",
     )
-    subflow: Optional[Literal[_ALL_SUBFLOWS]] = Field(
-        default=None,
-        description="Exact subflow belonging to the selected flow",
-    )
-    confidence: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Classification confidence from 0.0 to 1.0.",
-    )
-    reasoning: str = Field(
-        min_length=1,
-        max_length=500,
-        description="Short explanation for the selected intent; do not include private chain-of-thought.",
-    )
-    needs_clarification: bool = Field(
-        description="True when the request cannot be reliably mapped to the taxonomy.",
+    chitchat_type: ChitchatType = Field(
+        description="The greeting/farewell/thanks/small_talk framing present, if any. "
+                     "'none' if has_actionable_request is true with no chitchat framing.",
     )
 
-    @field_validator("flow")
-    @classmethod
-    def validate_flow(cls, value: Optional[str]) -> Optional[str]:
-        if value is not None and value not in FLOW_SUBFLOWS:
-            raise ValueError(f"Invalid flow: {value}")
-        return value
+    flow: Optional[Literal[_ALL_FLOWS]] = Field(default=None)
+    subflow: Optional[Literal[_ALL_SUBFLOWS]] = Field(default=None)
+    confidence: float = Field(ge=0.0, le=1.0)
+    reasoning: str = Field(min_length=1, max_length=500)
+    needs_clarification: bool = Field(
+        description="True when there's an actionable request but it can't be reliably mapped.",
+    )
 
     @field_validator("subflow")
     @classmethod
     def validate_subflow(cls, value: Optional[str], info) -> Optional[str]:
         if value is not None:
             flow = info.data.get("flow")
-            if flow is None:
-                raise ValueError("subflow cannot be set when flow is null")
-            if value not in FLOW_SUBFLOWS.get(flow, []):
+            if flow is None or value not in FLOW_SUBFLOWS.get(flow, []):
                 raise ValueError(f"Invalid subflow '{value}' for flow '{flow}'")
         return value
+
+    @model_validator(mode="after")
+    def validate_consistency(self) -> "TriageResult":
+        if not self.has_actionable_request:
+            if self.flow is not None or self.subflow is not None:
+                raise ValueError("flow/subflow must be null when there is no actionable request")
+        elif not self.needs_clarification:
+            if self.flow is None or self.subflow is None:
+                raise ValueError(
+                    "an actionable, non-clarification result requires both flow and subflow"
+                )
+        return self
+
+    def canned_response(self, *, active_ticket: bool = False, pending_question: Optional[str] = None) -> str:
+        """Only meaningful when has_actionable_request is False."""
+        base = _CANNED_RESPONSES.get(self.chitchat_type, _DEFAULT_CANNED_RESPONSE)
+        if active_ticket and pending_question:
+            return f"{base} {pending_question}"
+        return base
 
 
 def _taxonomy_text() -> str:
@@ -182,101 +214,57 @@ def _taxonomy_text() -> str:
     return "\n".join(lines)
 
 
-# def _structured_response_format() -> dict[str, Any]:
-#     """JSON Schema for the triage result."""
-#     return {
-#         "type": "json_object",
-#         "schema": {
-#             "type": "object",
-#             "additionalProperties": False,
-#             "required": [
-#                 "flow",
-#                 "subflow",
-#                 "confidence",
-#                 "reasoning",
-#                 "needs_clarification",
-#             ],
-#             "properties": {
-#                 "flow": {
-#                     "type": ["string", "null"],
-#                     "enum": list(FLOW_SUBFLOWS.keys()) + [None],
-#                     "description": "Exact taxonomy flow.",
-#                 },
-#                 "subflow": {
-#                     "type": ["string", "null"],
-#                     "enum": list(SUBFLOW_DESCRIPTIONS.keys()) + [None],
-#                     "description": "Exact taxonomy subflow.",
-#                 },
-#                 "confidence": {
-#                     "type": "number",
-#                     "minimum": 0.0,
-#                     "maximum": 1.0,
-#                 },
-#                 "reasoning": {
-#                     "type": "string",
-#                 },
-#                 "needs_clarification": {
-#                     "type": "boolean",
-#                 },
-#             },
-#         },
-#     }
-
-
 TRIAGE_SYSTEM_PROMPT = f"""You are the triage classifier for a customer service system.
 
-Your ONLY task is to classify the customer's latest message into the single
-best (flow, subflow) pair from the fixed taxonomy below.
+STEP 1 — Determine whether the customer's latest message contains an actionable
+customer-service request (anything about an order, account, refund, product,
+shipping, billing, or similar).
+- Set has_actionable_request=true if there is ANY such request, even if it's
+  also preceded or followed by a greeting, thanks, or small talk
+  (e.g. "hi, I want to cancel my order" -> has_actionable_request=true).
+- Set has_actionable_request=false ONLY if the entire message is purely a
+  greeting, farewell, thanks, or small talk with nothing else in it.
+- Set chitchat_type to the greeting/farewell/thanks/small_talk framing present,
+  or "none" if there isn't any.
 
-Do not answer the customer.
-Do not perform actions.
-Do not decide business policy.
-Do not infer customer/account/order facts that were not provided.
-Do not invent categories.
+STEP 2 — Only if has_actionable_request is true, classify the request into
+exactly ONE (flow, subflow) pair from the fixed taxonomy below. If false,
+leave flow and subflow null and skip this step.
 
 TAXONOMY:
 {_taxonomy_text()}
 
 CLASSIFICATION RULES:
-1. Return exactly one valid flow/subflow pair when the request is classifiable.
-2. The subflow MUST belong to the selected flow.
-3. If the request is genuinely too vague, off-topic, or impossible to map,
-   set flow=null, subflow=null, needs_clarification=true, and use a low confidence.
-4. If two categories are plausible, choose the most specific category supported
-   by the message and reduce confidence.
-5. If there are multiple requests, classify the primary request expressed in the
-   latest user message. Mention only the existence of the secondary request in
-   the short reasoning; do not classify it as a second intent.
-6. Conversation history is context only. Do not treat assistant statements as
-   facts unless the customer confirms them.
-7. Confidence must represent classification certainty, not whether the customer
-   is likely to receive the requested outcome.
-8. Reasoning must be one short factual sentence. Do not expose hidden chain of
-   thought, internal deliberation, or policy reasoning.
-9. The response MUST be valid JSON matching the supplied schema.
+1. Choose the flow and subflow that best match the customer's request.
+2. If the message is ambiguous between two categories, pick the more specific
+   one and lower your confidence score accordingly.
+3. If there's an actionable request but it's too vague to classify confidently,
+   set needs_clarification=true and give your best guess with low confidence.
+4. If there are multiple distinct requests, classify only the PRIMARY one.
+   Mention the secondary request in "reasoning" only.
+5. Never invent information about the customer's order, account, or identity.
+6. Do not answer the customer, take actions, or decide policy -- classify only.
 """
 
 
-class TriageAgent:
-    """Triage node using the application's GenerationClient abstraction."""
+# ---------------------------------------------------------------------------
+# Agent
+# ---------------------------------------------------------------------------
 
+class TriageAgent:
     def __init__(
         self,
         llm: GenerationClient,
         *,
         temperature: float = 0.0,
-        max_tokens: int = 256,
+        max_tokens: int = 250,
     ) -> None:
         self.llm = llm
         self.temperature = temperature
         self.max_tokens = max_tokens
-        # self.response_format = _structured_response_format()
 
     @staticmethod
-    def _messages(
-        user_message: str,
-        conversation_history: Optional[list[Message]],
-    ) -> list[Message]:
+    def _messages(user_message: str, conversation_history: Optional[list[Message]]) -> list[Message]:
         messages = [Message(role="system", content=TRIAGE_SYSTEM_PROMPT)]
         if conversation_history:
             messages.extend(conversation_history)
@@ -288,14 +276,13 @@ class TriageAgent:
         user_message: str,
         conversation_history: Optional[list[Message]] = None,
     ) -> TriageResult:
-        """Classify a customer message and return a validated TriageResult."""
         if not user_message or not user_message.strip():
             return TriageResult(
-                flow=None,
-                subflow=None,
+                has_actionable_request=False,
+                chitchat_type=ChitchatType.NONE,
                 confidence=0.0,
-                reasoning="The customer message is empty and cannot be classified.",
-                needs_clarification=True,
+                reasoning="Empty message.",
+                needs_clarification=False,
             )
 
         try:
@@ -310,59 +297,34 @@ class TriageAgent:
         except Exception as exc:
             raise RuntimeError("Triage generation failed") from exc
 
-        try:
-            result = TriageResult.model_validate_json(response.text)
-        except (ValidationError, json.JSONDecodeError) as exc:
-            raise ValueError(
-                f"Provider returned invalid triage JSON: {response.text!r}"
-            ) from exc
-
-        # Final deterministic consistency checks. Never trust the model alone.
-        if result.needs_clarification:
-            if result.flow is not None or result.subflow is not None:
-                raise ValueError(
-                    "Invalid triage result: clarification must have null flow and subflow."
-                )
-            return result
-
-        if result.flow is None or result.subflow is None:
-            raise ValueError(
-                "Invalid triage result: a non-clarification result requires flow and subflow."
-            )
-
-        if result.subflow not in FLOW_SUBFLOWS[result.flow]:
-            raise ValueError(
-                f"Invalid taxonomy pair: {result.flow!r} / {result.subflow!r}"
-            )
-
-        return result
+        return TriageResult.model_validate_json(response.text)
 
 
 __all__ = [
     "FLOW_SUBFLOWS",
     "SUBFLOW_DESCRIPTIONS",
+    "ChitchatType",
     "TriageResult",
     "TriageAgent",
 ]
 
+
+# ---------------------------------------------------------------------------
+# Example usage
+# ---------------------------------------------------------------------------
+
 async def _example():
-    import os
-    from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
     from src.llm_providers import ProviderFactory, Provider
 
-    llm = ProviderFactory.create(Provider.GEMINI, model="gemini-3.1-flash-lite")
-    
+    llm = ProviderFactory.create(Provider.GEMINI, model="gemini-2.0-flash")
     agent = TriageAgent(llm=llm)
-    
-    result = await agent.classify(
-        user_message="I want to cancel my order, it hasn't shipped yet",
-    )
 
-    print(f"Flow: {result.flow}")
-    print(f"Subflow: {result.subflow}")
-    print(f"Confidence: {result.confidence}")
-    print(f"Needs Clarification: {result.needs_clarification}")
-    print(f"Reasoning: {result.reasoning}")
+    for msg in ["hi", "hi, I want to cancel my order", "thanks so much!", "cancel order 4471"]:
+        result = await agent.classify(msg)
+        if not result.has_actionable_request:
+            print(f"{msg!r} -> chitchat ({result.chitchat_type.value}): {result.canned_response()!r}")
+        else:
+            print(f"{msg!r} -> flow={result.flow} subflow={result.subflow} confidence={result.confidence}")
 
 
 if __name__ == "__main__":
