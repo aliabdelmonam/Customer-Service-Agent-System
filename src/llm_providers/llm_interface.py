@@ -13,7 +13,7 @@ from pydantic import BaseModel
 class Provider(str, Enum):
     COHERE = "cohere"
     GEMINI = "gemini"
-    GROK = "grok"
+    GROQ = "groq"
 
 
 @dataclass

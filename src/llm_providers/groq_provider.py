@@ -10,7 +10,7 @@ class GroqClient(GenerationClient):
     """Wraps Groq's API, which is OpenAI-compatible — reuses the
     `openai` SDK pointed at Groq's base URL instead of a bespoke client."""
 
-    def __init__(self, model: str = "llama-3.3-70b-versatile", **kwargs):
+    def __init__(self, model: str = "openai/gpt-oss-120b", **kwargs):
         api_key = settings.GROQ_API_KEY
         if not api_key:
             raise ValueError("GROQ_API_KEY not set and no api_key provided")
@@ -48,7 +48,7 @@ class GroqClient(GenerationClient):
                     "type": "json_schema",
                     "json_schema": {
                         "name": output_schema.__name__,
-                        "schema": output_schema,
+                        "schema": output_schema.model_json_schema(),
                     },
                 }
 

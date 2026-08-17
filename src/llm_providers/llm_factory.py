@@ -2,14 +2,14 @@
 LLM Provider Factory
 =====================
 
-Unified interface over multiple LLM providers (Cohere, Google Gemini, xAI Grok)
+Unified interface over multiple LLM providers (Cohere, Google Gemini,  Groq)
 so the rest of the agent (triage, resolution, etc.) calls one consistent
 `GenerationClient.generate(...)` regardless of which provider is behind it.
 
 Install what you need:
     pip install cohere --break-system-packages
     pip install google-genai --break-system-packages
-    pip install openai --break-system-packages   # xAI Grok is OpenAI-compatible
+    pip install openai --break-system-packages   #  Groq is OpenAI-compatible
 """
 from __future__ import annotations
 from typing import Any, Optional
@@ -24,7 +24,7 @@ from .groq_provider import GroqClient
 _PROVIDER_REGISTRY: dict[Provider, type[GenerationClient]] = {
     Provider.COHERE: CohereClient,
     Provider.GEMINI: GeminiClient,
-    Provider.GROK: GroqClient,
+    Provider.GROQ: GroqClient,
 }
 
 
