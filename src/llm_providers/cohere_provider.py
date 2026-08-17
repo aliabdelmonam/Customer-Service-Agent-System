@@ -5,8 +5,7 @@ from .llm_interface import GenerationClient, GenerationResponse, Message, Provid
 from typing import Any, Optional
 import os
 from src.Utils import settings
-from pydantic_settings import BaseModel
-
+from pydantic import BaseModel
 
 class CohereClient(GenerationClient):
     """Wraps Cohere's chat API (ClientV2 / async)."""
@@ -46,7 +45,7 @@ class CohereClient(GenerationClient):
             if output_schema is not None:
                 chat_kwargs["response_format"] = {
                     "type": "json_object",
-                    "json_schema": output_schema.model_json_schema(),
+                    "json_schema": output_schema,
                 }
 
             resp = await self._client.chat(**chat_kwargs)

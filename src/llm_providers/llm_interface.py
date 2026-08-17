@@ -5,8 +5,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional
-from pydantic_settings import BaseModel
-
+from pydantic import BaseModel
 # ---------------------------------------------------------------------------
 # Shared types
 # ---------------------------------------------------------------------------

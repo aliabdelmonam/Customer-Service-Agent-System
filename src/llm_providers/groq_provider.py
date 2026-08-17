@@ -4,8 +4,7 @@
 from .llm_interface import GenerationClient, GenerationResponse, Message, ProviderError, Provider
 from typing import Any
 from src.Utils import settings
-from pydantic_settings import BaseModel
-
+from pydantic import BaseModel
 
 class GroqClient(GenerationClient):
     """Wraps Groq's API, which is OpenAI-compatible — reuses the
@@ -49,7 +48,7 @@ class GroqClient(GenerationClient):
                     "type": "json_schema",
                     "json_schema": {
                         "name": output_schema.__name__,
-                        "schema": output_schema.model_json_schema(),
+                        "schema": output_schema,
                     },
                 }
 

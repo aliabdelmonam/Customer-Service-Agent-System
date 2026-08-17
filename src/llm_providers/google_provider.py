@@ -2,11 +2,13 @@
 # ---------------------------------------------------------------------------
 # Google Gemini
 # ---------------------------------------------------------------------------
+from pyexpat.errors import messages
+
 from .llm_interface import GenerationClient, GenerationResponse, Message, ProviderError, Provider
-from typing import Any, Optional
-import os
-from src.Utils import settings
-from pydantic_settings import BaseModel
+from typing import Any
+from src.Utils import config, settings
+from pydantic import BaseModel
+from google.genai import types
 
 
 class GeminiClient(GenerationClient):
@@ -26,15 +28,14 @@ class GeminiClient(GenerationClient):
         return Provider.GEMINI.value
 
     async def generate(
-        self,
-        messages: list[Message],
-        temperature: float = 0.3,
-        max_tokens: int = 1024,
-        output_schema: type[BaseModel] | None = None,
-        **kwargs: Any,
-    ) -> GenerationResponse:
+    self,
+    messages: list[Message],
+    temperature: float = 0.3,
+    max_tokens: int = 1024,
+    output_schema: type[BaseModel] | None = None,
+    **kwargs: Any,
+) -> GenerationResponse:
         try:
-            # Gemini separates system instructions from the turn history.
             system_msgs = [m.content for m in messages if m.role == "system"]
             turn_msgs = [m for m in messages if m.role != "system"]
 
@@ -42,19 +43,29 @@ class GeminiClient(GenerationClient):
                 {"role": "user" if m.role == "user" else "model", "parts": [{"text": m.content}]}
                 for m in turn_msgs
             ]
-            config: dict[str, Any] = {
-            "system_instruction": "\n".join(system_msgs) if system_msgs else None,
-            "temperature": temperature,
-            "max_output_tokens": max_tokens,
-            **kwargs,
+
+            generation_config: dict[str, Any] = {
+                "temperature": temperature,
+                "max_output_tokens": max_tokens,
+                **kwargs,
             }
+
+            if system_msgs:
+                generation_config["system_instruction"] = "\n".join(system_msgs)
+
             if output_schema is not None:
-                config["response_mime_type"] = "application/json"
-                config["response_schema"] = output_schema
+                generation_config["response_mime_type"] = "application/json"
+                # response_json_schema (not response_schema) accepts raw JSON
+                # Schema as a plain dict — it isn't validated against Google's
+                # restricted Schema pydantic type, so keywords like
+                # "additionalProperties" from a normal Pydantic-generated
+                # schema won't be rejected.
+                generation_config["response_json_schema"] = output_schema.model_json_schema()
+
             resp = await self._client.aio.models.generate_content(
                 model=self.model,
                 contents=contents,
-                config=config,
+                config=types.GenerateContentConfig(**generation_config),
             )
 
             usage = {}
