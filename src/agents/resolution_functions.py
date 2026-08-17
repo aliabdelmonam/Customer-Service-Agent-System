@@ -21,7 +21,7 @@ def _placeholder(action: str, slots: dict[str, Any], **details: Any) -> Function
 
 
 async def subscription_status(slots: dict[str, Any]) -> FunctionResult:
-    return _placeholder("subscription_status", slots, subscription_status="unknown")
+    return _placeholder("subscription_status", slots, subscription_status="Gold")
 
 
 async def instructions(slots: dict[str, Any]) -> FunctionResult:
@@ -29,7 +29,7 @@ async def instructions(slots: dict[str, Any]) -> FunctionResult:
 
 
 async def make_purchase(slots: dict[str, Any]) -> FunctionResult:
-    return _placeholder("make_purchase", slots, purchase_created=False)
+    return _placeholder("make_purchase", slots, purchase_created=True)
 
 
 async def ask_the_oracle(slots: dict[str, Any]) -> FunctionResult:
