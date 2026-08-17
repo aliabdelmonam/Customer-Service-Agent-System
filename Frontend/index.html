@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Service</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Customer Service</h1>
+          <p class="subtitle">24/7 Support</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn-icon" id="settings-btn" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 
+
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="settings-panel" id="settings-panel">
+      <div class="settings-content">
+        <label for="api-url">Backend API URL</label>
+        <input type="text" id="api-url" placeholder="http://localhost:8000" />
+        <label for="api-endpoint">Chat Endpoint</label>
+        <input type="text" id="api-endpoint" placeholder="/chat" />
+        <div class="settings-actions">
+          <button class="btn-secondary" id="settings-cancel">Cancel</button>
+          <button class="btn-primary" id="settings-save">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <main class="chat-area" id="chat-area">
+      <div class="welcome">
+        <div class="welcome-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+        <h2>Welcome to Customer Service</h2>
+        <p>We are ready to assist you!</p>
+        <div class="quick-prompts">
+          <!-- <button class="prompt-chip" data-prompt="I've been feeling really anxious lately">Feeling anxious</button> -->
+          <!-- <button class="prompt-chip" data-prompt="How can I manage stress at work?">Managing stress</button> -->
+          <!-- <button class="prompt-chip" data-prompt="I'm having trouble sleeping because of my worries">Trouble sleeping</button> -->
+          <!-- <button class="prompt-chip" data-prompt="What are some coping strategies for depression?">Coping strategies</button> -->
+        </div>
+      </div>
+    </main>
+
+    <footer class="input-area">
+      <div class="input-wrapper">
+        <textarea
+          id="message-input"
+          placeholder="Type your message..."
+          rows="1"
+          autofocus
+        ></textarea>
+        <button class="btn-send" id="send-btn" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+      <p class="disclaimer">Customer Service You can talk about any thing</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
