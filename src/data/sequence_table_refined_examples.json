@@ -1,0 +1,108 @@
+[
+  {
+    "flow": "Order Issue",
+    "subflow": "Manage Cancel",
+    "steps": [
+      {
+        "step_type": "slot",
+        "name": "account_id",
+        "source": "system_derivable",
+        "note": "Comes from authenticated session, never asked of customer."
+      },
+      {
+        "step_type": "action",
+        "name": "verify_identity",
+        "note": "System looks up the account using session-derived account_id."
+      },
+      {
+        "step_type": "slot",
+        "name": "order_id",
+        "source": "customer_provided",
+        "note": "If customer has exactly one open order, system_derivable instead -- try lookup before asking."
+      },
+      {
+        "step_type": "action",
+        "name": "get_shipping_status",
+        "note": "System call, not a customer question -- ABCD's 'ask shipping status' step is wrong to ask; it's account data."
+      },
+      {
+        "step_type": "check",
+        "name": "shipping_status_is_order_received",
+        "on_true": "cancel_and_refund_immediately",
+        "on_false": "check_membership_level"
+      },
+      {
+        "step_type": "slot",
+        "name": "membership_level",
+        "source": "system_derivable",
+        "note": "ABCD's guideline says 'ask the customer' -- this should be looked up from the account, not asked."
+      },
+      {
+        "step_type": "check",
+        "name": "membership_tier_allows_early_refund",
+        "on_true": "offer_refund_now_return_after_delivery",
+        "on_false": "defer_until_delivery"
+      },
+      {
+        "step_type": "action",
+        "name": "execute_cancel_or_defer"
+      },
+      {
+        "step_type": "response",
+        "name": "confirm_outcome_to_customer"
+      }
+    ]
+  },
+  {
+    "flow": "Product Defect",
+    "subflow": "Initiate Refund",
+    "steps": [
+      {
+        "step_type": "slot",
+        "name": "account_id",
+        "source": "system_derivable"
+      },
+      {
+        "step_type": "action",
+        "name": "verify_identity"
+      },
+      {
+        "step_type": "slot",
+        "name": "order_id",
+        "source": "customer_provided"
+      },
+      {
+        "step_type": "action",
+        "name": "validate_purchase",
+        "note": "System check: was this a real purchase, within window."
+      },
+      {
+        "step_type": "check",
+        "name": "purchase_within_return_window",
+        "on_true": "continue",
+        "on_false": "reject_refund_expired_window"
+      },
+      {
+        "step_type": "slot",
+        "name": "refund_reason",
+        "source": "customer_provided",
+        "note": "Extracted from customer message, constrained to a fixed enum (stain/color/size/defect)."
+      },
+      {
+        "step_type": "slot",
+        "name": "refund_amount",
+        "source": "system_derivable",
+        "note": "Pulled from order line-item price, NOT asked of or trusted from the customer -- money value."
+      },
+      {
+        "step_type": "action",
+        "name": "queue_refund_for_approval",
+        "note": "Per current scope: all refunds route to human approval, not auto-executed."
+      },
+      {
+        "step_type": "response",
+        "name": "confirm_submission_to_customer"
+      }
+    ]
+  }
+]

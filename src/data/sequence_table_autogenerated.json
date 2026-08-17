@@ -1,0 +1,2117 @@
+[
+  {
+    "flow": "Product Defect",
+    "subflow": "Initiate Refund",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID using [Pull up Account].  This will pull up their account in the background with the right information related to this user.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "To confirm that their purchase is valid with [Validate Purchase]:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Refund method in [Record Reason] - valid options are",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "Add in additional information using [Enter Details]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Offer Refund",
+        "instruction": "Dollar amount - enter this value into the details form (without the dollar sign)",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Product Defect",
+    "subflow": "Update Refund",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "Confirm that their purchase is valid with [Validate Purchase]:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Find out the new item they want to return:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Offer Refund",
+        "instruction": "Get the dollar amount to refund",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Product Defect",
+    "subflow": "Refund Status",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "Gather details to find the appropriate order:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Respond with the information to the customer in natural language",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Notify Internal Team",
+        "instruction": "If the customer is not satisfied with your answer, and would like to change their refund",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Product Defect",
+    "subflow": "Return Due to Stain",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "Confirm that their purchase is valid with [Validate Purchase]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Confirm their order can be returned, by checking their membership level.",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "End Conversation",
+        "instruction": "Communication",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "Since the customer will print out a shipping label for the return, you need their full address.  You can give this explanation if the customer asks why you need the address.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "Ask the customer how they would like to process their return:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Product Defect",
+    "subflow": "Return Due to Color",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "Confirm that their purchase is valid with [Validate Purchase]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Confirm their order can be returned, by checking their membership level.",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "End Conversation",
+        "instruction": "Communication",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "Since the customer will print out a shipping label for the return, you need their full address.  You can give this explanation if the customer asks why you need the address.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "Ask the customer how they would like to process their return:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Product Defect",
+    "subflow": "Return Due to Size",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "Confirm that their purchase is valid with [Validate Purchase]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Confirm their order can be returned, by checking their membership level.",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "End Conversation",
+        "instruction": "Communication",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "Since the customer will print out a shipping label for the return, you need their full address.  You can give this explanation if the customer asks why you need the address.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "Ask the customer how they would like to process their return:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Order Issue",
+    "subflow": "Status Mystery Fee",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "If Oracle Says No, this means the customer possibly made an error",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "Offer to remove fee (only for Gold or Silver member)",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Order Issue",
+    "subflow": "Status Delivery Time",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "If Oracle Says No, this means the customer possibly made an error",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "x",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Order Issue",
+    "subflow": "Status Payment Method",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "Change the payment method",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Order Issue",
+    "subflow": "Status Quantity",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "(Only if Oracle says Yes) Find out whether the item has already shipped.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Offer Refund",
+        "instruction": "(Only if Oracle says Yes) Find out how much the item cost",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Order Issue",
+    "subflow": "Manage Upgrade",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Find out how much the extra fee will be for upgraded overnight shipping",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "Finally, you want to upgrade their shipping time.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Order Issue",
+    "subflow": "Manage Downgrade",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Determine how to manage the shipping cost",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "If the item has not yet been shipped, then you can change it",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Order Issue",
+    "subflow": "Manage Create",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Silver and Gold members get special treatment.  Ask the customer for their membership level, if they qualify:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Make Purchase",
+        "instruction": "To add to an item to the order you will need to enter its name",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Order Issue",
+    "subflow": "Manage Cancel",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Ask the customer for their membership level.",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Offer Refund",
+        "instruction": "Find out how much the item cost that is meant to be returned",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Account Access",
+    "subflow": "Recover Username",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Ask the customer for their Full name or Account ID with [Pull up Account].   This loads information in the background related to this user.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Ask the customer for 3 out of 4 items below and use the [Verify Identity] button",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "You make up their username with the first letter of their first name, their last name with a 1",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Account Access",
+    "subflow": "Recover Password",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "Get the customer\u2019s username to check their identity",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Tell the customer you cannot get their password, but you can generate a new one for them.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Make Password",
+        "instruction": "To operate the [Make Password] action, you will first need:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Account Access",
+    "subflow": "Reset Two-Factor Auth",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "You will need their email address so you can email them the reset code:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Send Link",
+        "instruction": "Inform the customer that to be safe, they should also follow best practices for security.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Troubleshoot Site",
+    "subflow": "Invalid Credit Card",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Try Again",
+        "instruction": "Option 1",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Log Out/In",
+        "instruction": "Option 2",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "Option 3",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Make Purchase",
+        "instruction": "Option 4 - Make the purchase for the customer.  To do this:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Troubleshoot Site",
+    "subflow": "Cart Not Updating",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Try Again",
+        "instruction": "Option 1",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Log Out/In",
+        "instruction": "Option 2",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "Option 3",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Make Purchase",
+        "instruction": "Option 4 - Make the purchase for the customer.  To do this:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Troubleshoot Site",
+    "subflow": "Search Not Working",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Log Out/In",
+        "instruction": "Option 1",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Instructions",
+        "instruction": "Option 2",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Notify Internal Team",
+        "instruction": "Option 3",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Try Again",
+        "instruction": "Option 4",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Make Purchase",
+        "instruction": "Option 5 - Make the purchase for the customer.  To do this:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Troubleshoot Site",
+    "subflow": "Website Too Slow",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Notify Internal Team",
+        "instruction": "Option 1",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Log Out/In",
+        "instruction": "Option 2",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Try Again",
+        "instruction": "Option 3",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Instructions",
+        "instruction": "Option 4",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Make Purchase",
+        "instruction": "Option 5 - Make the purchase for the customer.  To do this:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Manage Account",
+    "subflow": "Status Service Added",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Ask the customer for their Full name or Account ID with [Pull up Account].  This loads information in the background with information related to this user.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Find out how the customer heard about this issue:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "If the customer is mistaken (Oracle says No), then explain:",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Account",
+        "instruction": "If the customer is correct (Oracle says Yes), then remove the extra service",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Offer Refund",
+        "instruction": "If it is a legitimate error, then you can offer a refund to the customer",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Manage Account",
+    "subflow": "Status Service Removed",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Find out how the customer heard about this issue:",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "If the customer is mistaken (Oracle says No), then explain that there was a mistake:",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Account",
+        "instruction": "If the customer is correct (Oracle says Yes), then reinstate the lost service",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Check that the service is now operational.  (i.e. 'Can you see the service properly activated on your account now?')",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Manage Account",
+    "subflow": "Status Shipping Question",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Send Link",
+        "instruction": "x",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Manage Account",
+    "subflow": "Status Credit Missing",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Find out where the credits originated from.  Apologize for any inconvenience.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "If the credit is not missing (Oracle returns No) , then it is a problem in the Customer Interface",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Promo Code",
+        "instruction": " If the credit is missing (Oracle returns Yes):",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Manage Account",
+    "subflow": "Manage Change Address",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "If they are trying to change address on the account, they must be able to provide their current address.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Verify the identity of the customer.  They must provide 3 out of 7 of the items below which you you enter into [Verify Identity]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Account",
+        "instruction": "Ask for the new, desired value.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Manage Account",
+    "subflow": "Manage Change Name",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "If they are trying to change the name on the account, they must be able to provide their current full name.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Verify the identity of the customer.  They must provide 3 out of 7 of the items below which you you enter into [Verify Identity]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Account",
+        "instruction": "Ask for the new, desired value.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Manage Account",
+    "subflow": "Manage Change Phone",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "To change the phone number, they must be able to provide their current number.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Verify the identity of the customer.  They must provide 3 out of 7 of the items below which you you enter into [Verify Identity]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Account",
+        "instruction": "Ask for the new, desired value. Format should be (XXX) XXX-XXXX",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Manage Account",
+    "subflow": "Manage Payment Method",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "To change payment method, ask for their current payment method",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Verify the identity of the customer.  They must provide 3 out of 7 of the items below which you you enter into [Verify Identity]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Account",
+        "instruction": "Ask for the new, desired value.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Purchase Dispute",
+    "subflow": "Bad Price Competitor",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID with [Pull up account].",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Find out why they are disputing a purchase price",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Check if this is a valid order by gathering the following info, then [Verify Identity]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Try to convince the customer that sometimes the prices change, and that is outside of your control.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Promo Code",
+        "instruction": "If they are still unhappy:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Purchase Dispute",
+    "subflow": "Bad Price Yesterday",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID with [Pull up account].",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Find out why they are disputing a purchase price",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Check if this is a valid order by gathering the following info, then [Verify Identity]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Try to convince the customer that sometimes the prices change, and that is outside of your control.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Promo Code",
+        "instruction": "If they are still unhappy:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Purchase Dispute",
+    "subflow": "Out-of-Stock General",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Notify Internal Team",
+        "instruction": "Let the customer know that you will write up a report and let the Purchasing Department know about this, so they can do a better job.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Check if the customer is satisfied",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Promo Code",
+        "instruction": "If they are still unhappy:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Purchase Dispute",
+    "subflow": "Out-of-Stock One Item",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Find out which item they are unhappy about",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Notify Internal Team",
+        "instruction": "Let the customer know that you will write up a report and let the Purchasing Department know about this, so they can do a better job.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Make Purchase",
+        "instruction": "If the customer is still not satisfied with the outcome, then offer to make the order for the customer",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Purchase Dispute",
+    "subflow": "Promo Code Invalid",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Typically promotions only last 7 days so check if the code was issued a long time ago.   That might be the reason it doesn\u2019t work.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "If the customer is wrong (Oracle says No), then:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Promo Code",
+        "instruction": "Generate the promo code and share that with them",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Purchase Dispute",
+    "subflow": "Promo Code Out of Date",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Typically promotions only last 7 days so check if the code was issued a long time ago.   That might be the reason it doesn\u2019t work.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "If the customer is wrong (Oracle says No), then:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Promo Code",
+        "instruction": "Generate the promo code and share that with them",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Purchase Dispute",
+    "subflow": "Mistimed Billing Already Returned",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "[Validate Purchase] to confirm that they have a valid order:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "Decide whether or not this is a valid error by checking the time frame.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "If it has not been long enough (less than 7 days), then:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "If this is a company error or a Gold member, then start processing the credit.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Purchase Dispute",
+    "subflow": "Mistimed Billing Never Bought",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "[Validate Purchase] to confirm that they have a valid order:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "If the customer is wrong (Oracle says No), then:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "If this is a company error or a Gold member, then start processing the credit.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Shipping Issue",
+    "subflow": "Shipping Status",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID with [Pull up Account].",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "To confirm that their purchase is valid with [Validate Purchase]:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "Ask the Oracle",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "If the Oracle says Yes, then you can confirm that the customer\u2019s order looks as expected and the email was incorrect",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "If the Oracle says No, then the customer will not be happy. To resolve, enter how you will fix the problem",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Shipping Issue",
+    "subflow": "Manage Shipping",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "Start by gathering the shipping status from the customer",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "To confirm that their purchase is valid with [Validate Purchase]:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "Finally, perform the action for the customer by updating their order",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Shipping Issue",
+    "subflow": "Missing Item",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "To confirm that their purchase is valid with [Validate Purchase]:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Record Reason",
+        "instruction": "When shipping items, it can often take a couple days for the product to arrive",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "If they have been waiting for less than a week (7 days or less), let the customer know that sometimes the package is mistakenly marked as delivered, but can still take a couple days to arrive",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "If the customer date has been waiting for a week or longer, let them know that you will ship a new order.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Make Purchase",
+        "instruction": "Finally resend the package",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Shipping Issue",
+    "subflow": "Shipping Cost",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Validate Purchase",
+        "instruction": "Start by confirming that their purchase is valid with [Validate Purchase]:",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Shipping Status",
+        "instruction": "Then, check to see status of their delivery",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Order",
+        "instruction": "If the status is 'Order Received' or  'In Transit', then offer to waive the fee on their shipment",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Offer Refund",
+        "instruction": "Alternatively, if the status is 'Out for Delivery' or 'Delivered', then the best you can do is to give them part of the shipping fee back.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Subscription Inquiry",
+    "subflow": "Status Active",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID with [Pull up account].",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Subscription Status",
+        "instruction": "Find out the status by using [Subscription Status] action",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Send Link",
+        "instruction": "Provide a link to their account so they can look this up themselves in the future.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "Enter Detail",
+        "instruction": "Optional Step",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Subscription Inquiry",
+    "subflow": "Status Due Amount",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID with [Pull up account].",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Subscription Status",
+        "instruction": "Find out the status by using [Subscription Status] action",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Send Link",
+        "instruction": "Provide a link to their account so they can look this up themselves in the future.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "Enter Detail",
+        "instruction": "Optional Step",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Subscription Inquiry",
+    "subflow": "Status Due Date",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID with [Pull up account].",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "action",
+        "label": "Subscription Status",
+        "instruction": "Find out the status by using [Subscription Status] action",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Send Link",
+        "instruction": "Provide a link to their account so they can look this up themselves in the future.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "Enter Detail",
+        "instruction": "Optional Step",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Subscription Inquiry",
+    "subflow": "Manage Pay Bill",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Detail",
+        "instruction": "The standard subscription is $99 a year.  Find out how much of this the customer wants to pay.",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "Ask if the customer has a credit card number.  If they do not, tell them you will use the credit card on the account",
+        "source_raw_type": "communication",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Account",
+        "instruction": "Finalize their subscription payment",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Subscription Inquiry",
+    "subflow": "Manage Extension",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Whether or not they get an extension depends on the membership level",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Update Account",
+        "instruction": "(Option A) If they get an extension",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "slot",
+        "label": "Enter Details",
+        "instruction": "(Option B) If they do not get an extension and escalate to the manager",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Subscription Inquiry",
+    "subflow": "Manage Dispute Bill",
+    "steps": [
+      {
+        "step_type": "slot",
+        "label": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "check",
+        "label": "Membership Privileges",
+        "instruction": "Whether or not they get an refund depends on the membership level",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "action",
+        "label": "Ask the Oracle",
+        "instruction": "If Bronze or Guest members, you need to [Ask the Oracle]",
+        "source_raw_type": "kb query",
+        "review_needed": false
+      },
+      {
+        "step_type": "slot",
+        "label": "Offer Refund",
+        "instruction": "Find out how much the customer is asking for",
+        "source_raw_type": "interaction",
+        "review_needed": true
+      }
+    ]
+  },
+  {
+    "flow": "Single-Item Query",
+    "subflow": "Boots FAQ",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Boots",
+        "instruction": "Decide which article of clothing the customer is asking about:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Select Answer",
+        "instruction": "Read through the list of 8 options",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "The system created response does not include all the information, so make sure to explain the details in natural language.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Single-Item Query",
+    "subflow": "Shirt FAQ",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Shirt",
+        "instruction": "Decide which article of clothing the customer is asking about:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Select Answer",
+        "instruction": "Read through the list of 8 options",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "The system created response does not include all the information, so make sure to explain the details in natural language.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Single-Item Query",
+    "subflow": "Jeans FAQ",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Jeans",
+        "instruction": "Decide which article of clothing the customer is asking about:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Select Answer",
+        "instruction": "Read through the list of 8 options",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "The system created response does not include all the information, so make sure to explain the details in natural language.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Single-Item Query",
+    "subflow": "Jacket FAQ",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Jacket",
+        "instruction": "Decide which article of clothing the customer is asking about:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Select Answer",
+        "instruction": "Read through the list of 8 options",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "The system created response does not include all the information, so make sure to explain the details in natural language.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Storewide Query",
+    "subflow": "Pricing FAQ",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Pricing",
+        "instruction": "Decide which kind of question the customer is asking about:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Select Answer",
+        "instruction": "Read through the list of 4 options",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "The automated system response does not include all the information, so make sure to explain the details in natural language.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Storewide Query",
+    "subflow": "Membership FAQ",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Membership",
+        "instruction": "Decide which kind of question the customer is asking about:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Select Answer",
+        "instruction": "Read through the list of 4 options",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "The automated system response does not include all the information, so make sure to explain the details in natural language.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Storewide Query",
+    "subflow": "Timing FAQ",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Timing",
+        "instruction": "Decide which kind of question the customer is asking about:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Select Answer",
+        "instruction": "Read through the list of 4 options",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "The automated system response does not include all the information, so make sure to explain the details in natural language.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  },
+  {
+    "flow": "Storewide Query",
+    "subflow": "Policy FAQ",
+    "steps": [
+      {
+        "step_type": "check",
+        "label": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Policy",
+        "instruction": "Decide which kind of question the customer is asking about:",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "check",
+        "label": "Select Answer",
+        "instruction": "Read through the list of 4 options",
+        "source_raw_type": "faq/policy",
+        "review_needed": true
+      },
+      {
+        "step_type": "response",
+        "label": "N/A",
+        "instruction": "The automated system response does not include all the information, so make sure to explain the details in natural language.",
+        "source_raw_type": "communication",
+        "review_needed": false
+      }
+    ]
+  }
+]
