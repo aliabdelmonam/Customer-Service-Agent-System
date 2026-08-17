@@ -1,0 +1,90 @@
+[
+  {
+    "policy_id": "order_cancel",
+    "derived_from": "Order Issue -> Manage Cancel",
+    "description": "Customer wants to cancel part or all of an order",
+    "preconditions": [
+      {
+        "check": "order.shipping_status == 'order_received'",
+        "on_true": {
+          "action": "cancel_and_refund_immediately",
+          "message": "Item removed from order, refund issued immediately."
+        }
+      },
+      {
+        "check": "order.shipping_status in ['in_transit', 'out_for_delivery', 'delivered']",
+        "on_true": {
+          "action": "check_membership_level",
+          "next": "membership_gate"
+        }
+      }
+    ],
+    "membership_gate": {
+      "check": "customer.membership_level in ['bronze', 'silver', 'gold']",
+      "on_true": {
+        "action": "offer_refund_now",
+        "message": "Refund issued now; customer must return item via mail after it arrives."
+      },
+      "on_false": {
+        "action": "defer_until_delivery",
+        "message": "Guest customers must wait for delivery, then contact support to start return."
+      }
+    }
+  },
+  {
+    "policy_id": "product_defect_refund",
+    "derived_from": "Product Defect -> Initiate Refund / Return Due to Size",
+    "description": "Customer wants a refund for a damaged, wrong-size, or wrong-color item",
+    "preconditions": [
+      {
+        "check": "identity.verified == true",
+        "on_false": {
+          "action": "escalate_or_reject",
+          "message": "Cannot proceed without identity verification"
+        }
+      },
+      {
+        "check": "order.purchase_date_within_days(90)",
+        "on_false": {
+          "action": "reject_return",
+          "message": "Purchase made more than 90 days ago, return window expired"
+        }
+      },
+      {
+        "check": "order.purchase_date_within_days(90) == true",
+        "on_true": {
+          "action": "approve_refund",
+          "message": "Refund approved, return label issued"
+        }
+      }
+    ]
+  },
+  {
+    "policy_id": "mystery_fee_dispute",
+    "derived_from": "Order Issue -> Status Mystery Fee",
+    "description": "Customer disputes an unexpected charge on their order",
+    "preconditions": [
+      {
+        "check": "system.company_error_confirmed == true",
+        "on_true": {
+          "action": "remove_fee",
+          "message": "Fee removed, company error confirmed"
+        }
+      },
+      {
+        "check": "system.company_error_confirmed == false and customer.membership_level in ['gold','silver']",
+        "on_true": {
+          "action": "remove_fee_courtesy",
+          "message": "Fee removed as courtesy for gold/silver member"
+        }
+      },
+      {
+        "check": "system.company_error_confirmed == false and customer.membership_level in ['bronze','guest']",
+        "on_true": {
+          "action": "reject_fee_removal",
+          "message": "Fee stands; apologize and end conversation"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,3317 @@
+[
+  {
+    "id": "product_defect__initiate_refund",
+    "domain": "Product Defect",
+    "intent": "Initiate Refund",
+    "customer_goal": "Initiate Refund",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID .  This will pull up their account in the background with the right information related to this user.",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "To confirm that their purchase is valid :",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID - last item, to be consistent with verify identity"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Refund method in [Record Reason] - valid options are",
+        "required_information": [
+          "Gift card - they want a prepaid gift card, also ask for their address so you know where to mail it.  Enter this value in the next step.",
+          "Add value - to add value to their account.",
+          "Paper check - also ask for their address so you know where to mail the check.  Enter this address in the next step.",
+          "Credit card - direct refund to their credit card, assume a credit card is already on file.  To find it, you will need the account ID, which is entered in the next step."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "Add in additional information ",
+        "required_information": [
+          "If the customer chose gift card or paper check then enter the full address",
+          "If the customer chose add value or credit card then enter the account ID"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Offer Refund",
+        "instruction": "Dollar amount - enter this value into the details form (without the dollar sign)",
+        "required_information": [
+          "Then click [Offer Refund]",
+          "If the customer does not know, the default amount is $50"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "product_defect__update_refund",
+    "domain": "Product Defect",
+    "intent": "Update Refund",
+    "customer_goal": "Update Refund",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "Confirm that their purchase is valid :",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID - you may have gotten this already to perform the status check"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Find out the new item they want to return:",
+        "required_information": [
+          "Get the brand and type, such as 'Old Navy Socks' or 'Nike Shoes'",
+          "Enter this into the input box and [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Offer Refund",
+        "instruction": "Get the dollar amount to refund",
+        "required_information": [
+          "Ask for the price of the product from the customer",
+          "The total refund is the amount of their previous refund plus their current one. > ie. if their old amount is $100 and their new item is $30, then the total is '130'",
+          "Enter the amount (without dollar sign) and then click [Offer Refund]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "product_defect__refund_status",
+    "domain": "Product Defect",
+    "intent": "Refund Status",
+    "customer_goal": "Refund Status",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "Gather details to find the appropriate order:",
+        "required_information": [
+          "Username - first",
+          "Email Address - second",
+          "Order ID - third",
+          "Then use a KB query to [Validate Purchase]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Respond with the information to the customer in natural language",
+        "required_information": [
+          "Pick a refund status from the list of three options > not started, in progress, complete",
+          "Tell the customer this is their refund status",
+          "Pick a payment method from the following three options > online, by phone, by chat",
+          "Tell the customer this is how they initiated that refund (i.e their payment method)"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Notify Internal Team",
+        "instruction": "If the customer is not satisfied with your answer, and would like to change their refund",
+        "required_information": [
+          "If they do not like the status: > Enter 'manager' into [Notify Internal Team] > Explain that you have escalated the issue to the manager",
+          "If they do not like the payment method: > Enter “change method” into [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "product_defect__return_due_to_stain",
+    "domain": "Product Defect",
+    "intent": "Return Due to Stain",
+    "customer_goal": "Return Due to Stain",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "Confirm that their purchase is valid ",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Confirm their order can be returned, by checking their membership level.",
+        "required_information": [
+          "Gold members: > Gold members get unlimited returns",
+          "Silver members: > Ask for the purchase date, return possible within the last 6 months <or> Ask if they have a receipt, get to return if user has receipt <or> Ask if in original packaging, get to return if in original packaging",
+          "Bronze members: > Ask for the purchase date, return possible within the last 90 days <or> Ask if they have a receipt, get to return if user has receipt <or> Ask if in original packaging, get to return if in original packaging",
+          "Guest members: > Ask for the purchase date, return possible within the last 30 days <or> Ask if they have a receipt, get to return if user has receipt",
+          "Enter the member level and then click the [Membership Privileges] option"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "End Conversation",
+        "instruction": "Communication",
+        "required_information": [
+          "If the customer can return, tell them the good news and go to the next step",
+          "If the customer cannot return, apologize and explain the problem. Then [End Conversation]"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "Since the customer will print out a shipping label for the return, you need their full address.  You can give this explanation if the customer asks why you need the address.",
+        "required_information": [
+          "Street Number and Street Name",
+          "City, State, Zip Code",
+          "Fill this as one line into [Enter Details]"
+        ]
+      },
+      {
+        "sequence": 6,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "Ask the customer how they would like to process their return:",
+        "required_information": [
+          "Options include: 'By Mail', 'In Store', or 'Drop off Center'",
+          "Fill in the form with one of these three values and submit to [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "product_defect__return_due_to_color",
+    "domain": "Product Defect",
+    "intent": "Return Due to Color",
+    "customer_goal": "Return Due to Color",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "Confirm that their purchase is valid ",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Confirm their order can be returned, by checking their membership level.",
+        "required_information": [
+          "Gold members: > Gold members get unlimited returns",
+          "Silver members: > Ask for the purchase date, return possible within the last 6 months <or> Ask if they have a receipt, get to return if user has receipt <or> Ask if in original packaging, get to return if in original packaging",
+          "Bronze members: > Ask for the purchase date, return possible within the last 90 days <or> Ask if they have a receipt, get to return if user has receipt <or> Ask if in original packaging, get to return if in original packaging",
+          "Guest members: > Ask for the purchase date, return possible within the last 30 days <or> Ask if they have a receipt, get to return if user has receipt",
+          "Enter the member level and then click the [Membership Privileges] option"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "End Conversation",
+        "instruction": "Communication",
+        "required_information": [
+          "If the customer can return, tell them the good news and go to the next step",
+          "If the customer cannot return, apologize and explain the problem. Then [End Conversation]"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "Since the customer will print out a shipping label for the return, you need their full address.  You can give this explanation if the customer asks why you need the address.",
+        "required_information": [
+          "Street Number and Street Name",
+          "City, State, Zip Code",
+          "Fill this as one line into [Enter Details]"
+        ]
+      },
+      {
+        "sequence": 6,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "Ask the customer how they would like to process their return:",
+        "required_information": [
+          "Options include: 'By Mail', 'In Store', or 'Drop off Center'",
+          "Fill in the form with one of these three values and submit to [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "product_defect__return_due_to_size",
+    "domain": "Product Defect",
+    "intent": "Return Due to Size",
+    "customer_goal": "Return Due to Size",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "Confirm that their purchase is valid ",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Confirm their order can be returned, by checking their membership level.",
+        "required_information": [
+          "Gold members: > Gold members get unlimited returns",
+          "Silver members: > Ask for the purchase date, return possible within the last 6 months <or> Ask if they have a receipt, get to return if user has receipt <or> Ask if in original packaging, get to return if in original packaging",
+          "Bronze members: > Ask for the purchase date, return possible within the last 90 days <or> Ask if they have a receipt, get to return if user has receipt <or> Ask if in original packaging, get to return if in original packaging",
+          "Guest members: > Ask for the purchase date, return possible within the last 30 days <or> Ask if they have a receipt, get to return if user has receipt",
+          "Enter the member level and then click the [Membership Privileges] option"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "End Conversation",
+        "instruction": "Communication",
+        "required_information": [
+          "If the customer can return, tell them the good news and go to the next step",
+          "If the customer cannot return, apologize and explain the problem. Then [End Conversation]"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "Since the customer will print out a shipping label for the return, you need their full address.  You can give this explanation if the customer asks why you need the address.",
+        "required_information": [
+          "Street Number and Street Name",
+          "City, State, Zip Code",
+          "Fill this as one line into [Enter Details]"
+        ]
+      },
+      {
+        "sequence": 6,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "Ask the customer how they would like to process their return:",
+        "required_information": [
+          "Options include: 'By Mail', 'In Store', or 'Drop off Center'",
+          "Fill in the form with one of these three values and submit to [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "order_issue__status_mystery_fee",
+    "domain": "Order Issue",
+    "intent": "Status Mystery Fee",
+    "customer_goal": "Status Mystery Fee",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "Check if the company made error by 'Asking the Oracle' which will return Yes or No",
+          "If this was a company mistake (Oracle says Yes), skip the next step",
+          "Make sure to explain the result in natural language."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "If Oracle Says No, this means the customer possibly made an error",
+        "required_information": [
+          "Ask the customer for their membership level and enter into [Membership Privileges]",
+          "If Gold or Silver: > We trust our gold and silver members.  Thus, they will always get their extra fees removed.  Go to next step.",
+          "If Guest or Bronze: > Then this is a customer error, and the extra fee stays. You cannot do anything > Apologize for the issue and [End Conversation]"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "Offer to remove fee (only for Gold or Silver member)",
+        "required_information": [
+          "Confirm the amount that the customer felt was overcharged",
+          "Enter this value (without dollar sign) and select [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "order_issue__status_delivery_time",
+    "domain": "Order Issue",
+    "intent": "Status Delivery Time",
+    "customer_goal": "Status Delivery Time",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "Check if the company made error by 'Asking the Oracle' which will return Yes or No",
+          "If this was a company mistake (Oracle says Yes), skip the next step",
+          "Make sure to explain the result in natural language."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "If Oracle Says No, this means the customer possibly made an error",
+        "required_information": []
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "x",
+        "required_information": []
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "order_issue__status_payment_method",
+    "domain": "Order Issue",
+    "intent": "Status Payment Method",
+    "customer_goal": "Status Payment Method",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "required_information": [
+          "Ask for the shipping status from the customer and enter into [Shipping Status]",
+          "If the item is 'Order Received' or 'In Transit', then you can change the payment method immediately (go to the next step).",
+          "If the item is 'Out for Delivery' or 'Delivered' then the new payment method only applies to future orders (explain to the customer and see if they still want to change payment method)."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "Change the payment method",
+        "required_information": [
+          "Enter in the new, desired payment method which can be credit card, debit card or paypal",
+          "Select the [Update Order] option with the new payment method"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "order_issue__status_quantity",
+    "domain": "Order Issue",
+    "intent": "Status Quantity",
+    "customer_goal": "Status Quantity",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "Check if the email is accurate by 'Asking the Oracle' which will return Yes or No",
+          "If the email was wrong (Oracle returns No), then assure the customer that they were only charged for one item and that the email was wrong. Skip the following steps and [End Conversation] after explaining.",
+          "If the email was right (Oracle returns Yes), then it is a company mistake.  Continue to the next step below."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "(Only if Oracle says Yes) Find out whether the item has already shipped.",
+        "required_information": [
+          "Ask for the shipping status from the customer and then submit using [Shipping Status]",
+          "If the item is Order Received, then immediately offer the refund and tell the customer the unwanted item has been removed from their order.",
+          "If the item is 'In Transit', 'Out for Delivery' or 'Delivered' then they must wait until the item arrives and call back to customer support to start the return process."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Offer Refund",
+        "instruction": "(Only if Oracle says Yes) Find out how much the item cost",
+        "required_information": [
+          "Ask the customer how much is the cost of the item meant to be returned",
+          "Enter that into the form and select the [Offer Refund] option"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "order_issue__manage_upgrade",
+    "domain": "Order Issue",
+    "intent": "Manage Upgrade",
+    "customer_goal": "Manage Upgrade",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "required_information": [
+          "Ask for the shipping status from customer, and enter into [Shipping Status] > Possible options: ['Order Received', 'In Transit', 'Out for Delivery', 'Delivered']",
+          "If the item is 'Order Received' > Then the company has received the order, but the item has not yet shipped > Move onto the next step",
+          "If the item is 'In Transit', 'Out for Delivery', or 'Delivered' then it is too late > The item has already shipped and the date cannot be altered > However, this means the item will likely arrive today or tomorrow anyway > Explain this to the customer and [End Conversation]"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Find out how much the extra fee will be for upgraded overnight shipping",
+        "required_information": [
+          "Ask the customer for their membership level.  Type it into the field and then select the [Membership Privileges] option.",
+          "Gold members: > Gold members have their fee waived",
+          "Guest, Bronze or Silver members: > Ask them if they can charge $20 to the credit card on their account > The answer should be yes, since that is the only way to pay"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "Finally, you want to upgrade their shipping time.",
+        "required_information": [
+          "Enter 'tomorrow' and then select [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "order_issue__manage_downgrade",
+    "domain": "Order Issue",
+    "intent": "Manage Downgrade",
+    "customer_goal": "Manage Downgrade",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "required_information": [
+          "Ask for the shipping status from customer, and enter into [Shipping Status] > Possible options: ['Order Received', 'In Transit', 'Out for Delivery', 'Delivered']",
+          "If the item is 'Order Received' > Then the company has received the order, but the item has not yet shipped > Move onto the next step",
+          "If the item is 'In Transit', 'Out for Delivery', or 'Delivered' then it is too late > The item has already shipped and the date cannot be altered > Then move onto the next step"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Determine how to manage the shipping cost",
+        "required_information": [
+          "Find the membership level and enter into [Membership Privileges]",
+          "If Gold, Silver or Bronze: > If not yet shipped, tell the customer you can delay the shipping date with no problem.  Then head to the next step. > If already shipped, tell the customer you can add a credit back to their account for the amount of the shipping fee.  Then  [End Conversation]",
+          "If Guest member: > If not yet shipped, tell the customer you can delay the shipping date with no problem.  Then head to the next step. > If already shipped, tell the customer there is nothing you can do.  Apologize for any inconvenience and [End Conversation]"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "If the item has not yet been shipped, then you can change it",
+        "required_information": [
+          "Enter 'next week' into the field and [Update Order]",
+          "Finally ask if they need anything else and [End Conversation]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "order_issue__manage_create",
+    "domain": "Order Issue",
+    "intent": "Manage Create",
+    "customer_goal": "Manage Create",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "required_information": [
+          "Ask the customer for the shipping status, and enter into [Shipping Status]",
+          "If the item is Order Received, then skip the next step and directly update the order.",
+          "If the item is 'In Transit', 'Out for Delivery', or 'Delivered' then it is too late.  Move to the next step (membership level)."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Silver and Gold members get special treatment.  Ask the customer for their membership level, if they qualify:",
+        "required_information": [
+          "Enter the Gold or Silver level.  Their existing order is already out for delivery, so instead you will ship the new item to them ASAP in a separate order with no shipping fee.",
+          "Choose the [Membership Privileges] option"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Make Purchase",
+        "instruction": "To add to an item to the order you will need to enter its name",
+        "required_information": [
+          "Enter a phrase of brand and item, such as 'Guess Jeans' or 'Calvin Klein Shirt'",
+          "Then select [Make Purchase]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "order_issue__manage_cancel",
+    "domain": "Order Issue",
+    "intent": "Manage Cancel",
+    "customer_goal": "Manage Cancel",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "Find out whether the item has already shipped.",
+        "required_information": [
+          "Ask customer for the shipping status and then submit using [Shipping Status]",
+          "If the item is Order Received, then immediately offer the refund and tell the customer the unwanted item has been removed from their order.",
+          "If the item is 'In Transit', 'Out for Delivery' or 'Delivered' then check their membership level (next step)."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Ask the customer for their membership level.",
+        "required_information": [
+          "If they are bronze, silver or gold: > Enter Gold or Silver, depending on the level into the text box > Click the [Membership Privileges] option > Tell them you can offer a refund immediately.  After the item arrives, the customer should then call back to customer support to get the shipping label for return.",
+          "If they are a Guest customer, then they must wait until the item arrives and call back to customer support to start the return process. [End Conversation] after communicating the above."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Offer Refund",
+        "instruction": "Find out how much the item cost that is meant to be returned",
+        "required_information": [
+          "Enter the amount in the box",
+          "Select the [Offer Refund] option"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "account_access__recover_username",
+    "domain": "Account Access",
+    "intent": "Recover Username",
+    "customer_goal": "Recover Username",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Ask the customer for their Full name or Account ID .   This loads information in the background related to this user.",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Ask the customer for 3 out of 4 items below and use the [Verify Identity] button",
+        "required_information": [
+          "Full name - first and last",
+          "Zip Code",
+          "Phone number",
+          "Email Address"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "You make up their username with the first letter of their first name, their last name with a 1",
+        "required_information": [
+          "For example: John Smith → jsmith1",
+          "For example: Wendy Chesterfield → wchesterfield1",
+          "If you are here as part of [Validate Purchase] action or some external flow assume this new username is correct even if the system says it is not valid, and just continue forward with the conversation"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "account_access__recover_password",
+    "domain": "Account Access",
+    "intent": "Recover Password",
+    "customer_goal": "Recover Password",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "Get the customer’s username to check their identity",
+        "required_information": [
+          "If they don’t have their username, then follow the 'Recover Username' flow above",
+          "Once you have it, enter the username and click on [Enter Details]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Tell the customer you cannot get their password, but you can generate a new one for them.",
+        "required_information": []
+      },
+      {
+        "sequence": 4,
+        "type": "kb query",
+        "action": "Make Password",
+        "instruction": "To operate the [Make Password] action, you will first need:",
+        "required_information": [
+          "Pin Number <or> answer to the Security Question",
+          "Enter either value into the box and then click the [Make Password] button"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "account_access__reset_two-factor_auth",
+    "domain": "Account Access",
+    "intent": "Reset Two-Factor Auth",
+    "customer_goal": "Reset Two-Factor Auth",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "You will need their email address so you can email them the reset code:",
+        "required_information": [
+          "Enter their email address with the [Enter Details] action",
+          "If they don’t have their email address, you can bypass this problem by getting one of the following two items: > Ask for their PIN number > Tell them you are going to ask the security question, which is 'What is your mother’s maiden name?'",
+          "Then submit that value into the [Enter Details] form instead.  Tell them that you will send the reset code to the email address saved on file.  Feel free to make up an email address if the customer asks for it."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Send Link",
+        "instruction": "Inform the customer that to be safe, they should also follow best practices for security.",
+        "required_information": [
+          "Tell them you will send a link about security best practices",
+          "Then click the [Send Link] button, you do not need to enter anything into the form"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "troubleshoot_site__invalid_credit_card",
+    "domain": "Troubleshoot Site",
+    "intent": "Invalid Credit Card",
+    "customer_goal": "Invalid Credit Card",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Try Again",
+        "instruction": "Option 1",
+        "required_information": [
+          "Instruct the customer to try entering their credit card information again",
+          "Choose the [Try Again] option as your action. Nothing to enter in the form."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Log Out/In",
+        "instruction": "Option 2",
+        "required_information": [
+          "Instruct the customer to log out of their account and log back in.",
+          "Choose the [Log Out/In] option as your action.  Nothing to enter in the form."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "Option 3",
+        "required_information": [
+          "Have the customer check the expiration date, maybe the credit card is too old",
+          "Enter 'troubleshoot' into the form and choose the [Enter Details] option as your action."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Make Purchase",
+        "instruction": "Option 4 - Make the purchase for the customer.  To do this:",
+        "required_information": [
+          "Start by asking for the customer’s credit card number",
+          "Then ask for the expiration date",
+          "Enter a phrase of brand and item, such as 'Guess Jeans' or 'Calvin Klein Shirt'",
+          "Then select [Make Purchase]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "troubleshoot_site__cart_not_updating",
+    "domain": "Troubleshoot Site",
+    "intent": "Cart Not Updating",
+    "customer_goal": "Cart Not Updating",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Try Again",
+        "instruction": "Option 1",
+        "required_information": [
+          "Instruct the customer to refresh the page and add the item again.",
+          "Choose the [Try Again] option as your action. Nothing to enter in the form."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Log Out/In",
+        "instruction": "Option 2",
+        "required_information": [
+          "Instruct the customer to log out of their account and log back in.",
+          "Choose the [Log Out/In] option as your action.  Nothing to enter in the form."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "Option 3",
+        "required_information": [
+          "Have the customer check whether the selected item is Out-of-Stock.  This will be listed on the bottom left-hand side of the product page.",
+          "Enter 'troubleshoot' into the form and choose the [Enter Details] option as your action."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Make Purchase",
+        "instruction": "Option 4 - Make the purchase for the customer.  To do this:",
+        "required_information": [
+          "Start by asking for the customer’s credit card number",
+          "Then ask for the expiration date",
+          "Enter a phrase of brand and item, such as 'Guess Jeans' or 'Calvin Klein Shirt'",
+          "Then select [Make Purchase]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "troubleshoot_site__search_not_working",
+    "domain": "Troubleshoot Site",
+    "intent": "Search Not Working",
+    "customer_goal": "Search Not Working",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Log Out/In",
+        "instruction": "Option 1",
+        "required_information": [
+          "Instruct the customer to log out of their account and log back in.",
+          "Choose the [Log Out/In] option as your action.  Nothing to enter in the form."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Instructions",
+        "instruction": "Option 2",
+        "required_information": [
+          "Tell the customer to try clearing out their cookies.",
+          "If the customer asks how: Cookies can be reset by checking the settings option in the browser and selecting 'More Details'",
+          "Choose the [Instructions] option as your action. Nothing to enter in the form."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Notify Internal Team",
+        "instruction": "Option 3",
+        "required_information": [
+          "Let the customer know that you will write up a report and let the Website Team know about this, so they can do a better job.",
+          "Enter 'website team' into the input box and [Notify Internal Team]"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Try Again",
+        "instruction": "Option 4",
+        "required_information": [
+          "Ask the customer what their original search item is.",
+          "Have the customer search for a different product, such as 'Prada Handbag'.  If that search works, then try to search the original item again.",
+          "Choose the [Try Again] option as your action."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Make Purchase",
+        "instruction": "Option 5 - Make the purchase for the customer.  To do this:",
+        "required_information": [
+          "Start by asking for the customer’s credit card number",
+          "Then ask for the expiration date",
+          "Enter a phrase of brand and item, such as 'Guess Jeans' or 'Calvin Klein Shirt'",
+          "Then select [Make Purchase]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "troubleshoot_site__website_too_slow",
+    "domain": "Troubleshoot Site",
+    "intent": "Website Too Slow",
+    "customer_goal": "Website Too Slow",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Notify Internal Team",
+        "instruction": "Option 1",
+        "required_information": [
+          "Let the customer know that you will write up a report about the slow speeds for the Website Team to fix.",
+          "Enter 'website team' into the input box and [Notify Internal Team]"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Log Out/In",
+        "instruction": "Option 2",
+        "required_information": [
+          "Instruct the customer to log out of their account and log back in.",
+          "Choose the [Log Out/In] option as your action.  Nothing to enter in the form."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Try Again",
+        "instruction": "Option 3",
+        "required_information": [
+          "Tell the customer to try visiting another website first.",
+          "If all websites are slow, then it is the customer’s internet connection and not a problem with the AcmeCorp website.",
+          "Choose the [Try Again] option as your action. Nothing to enter in the form."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Instructions",
+        "instruction": "Option 4",
+        "required_information": [
+          "Ask the customer to close all the other tabs on their browser. Also instruct them to close other programs that may be running.",
+          "Explain that many programs running in the background can cause a slowdown.",
+          "Choose the [Instructions] option as your action."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Make Purchase",
+        "instruction": "Option 5 - Make the purchase for the customer.  To do this:",
+        "required_information": [
+          "Start by asking for the customer’s credit card number",
+          "Then ask for the expiration date",
+          "Enter a phrase of brand and item, such as 'Guess Jeans' or 'Calvin Klein Shirt'",
+          "Then select [Make Purchase]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "manage_account__status_service_added",
+    "domain": "Manage Account",
+    "intent": "Status Service Added",
+    "customer_goal": "Status Service Added",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Ask the customer for their Full name or Account ID .  This loads information in the background with information related to this user.",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Find out how the customer heard about this issue:",
+        "required_information": [
+          "Options are one of the three ['email', 'spouse', 'news']",
+          "Enter this into the input box and [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "Tell the customer you will check your system about this problem.",
+          "You do not have to enter anything into the field.",
+          "Then [Ask the Oracle] if the customer made an error, which will return Yes or No"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "If the customer is mistaken (Oracle says No), then explain:",
+        "required_information": [
+          "If the customer was sent an email > Let them know this was a scam email, and if they check the sender, it isn’t from the official AcmeCorp marketing team.",
+          "If the customer was told this from their spouse > let them know they must have misheard.  They have nothing to worry about and there are no extra charges.",
+          "If the customer saw this in the news > then let them know nicely that they must have misunderstood.   They have nothing to worry about and there are no extra charges."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Account",
+        "instruction": "If the customer is correct (Oracle says Yes), then remove the extra service",
+        "required_information": [
+          "Enter in 'remove service' and use the [Update Account] button.",
+          "Tell the customer that the extra service has been removed."
+        ]
+      },
+      {
+        "sequence": 6,
+        "type": "interaction",
+        "action": "Offer Refund",
+        "instruction": "If it is a legitimate error, then you can offer a refund to the customer",
+        "required_information": [
+          "The amount should be for $40",
+          "Enter '40' in the field and then click on [Offer Refund]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "manage_account__status_service_removed",
+    "domain": "Manage Account",
+    "intent": "Status Service Removed",
+    "customer_goal": "Status Service Removed",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Find out how the customer heard about this issue:",
+        "required_information": [
+          "Options are one of the three ['email', 'spouse', 'news']",
+          "Enter this into the input box and [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "Tell the customer you will check your system about this problem.",
+          "Then [Ask the Oracle] if the customer is right, which will return Yes or No"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "If the customer is mistaken (Oracle says No), then explain that there was a mistake:",
+        "required_information": [
+          "If the customer was sent an email > Let them know this was a scam email, and if they check the sender, it isn’t from the official AcmeCorp marketing team.",
+          "If the customer was told this from their spouse > let them know they must have misheard.  They have nothing to worry about and there are no extra charges.",
+          "If the customer saw this in the news > then let them know nicely that they must have misunderstood.   They have nothing to worry about and there are no extra charges."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Account",
+        "instruction": "If the customer is correct (Oracle says Yes), then reinstate the lost service",
+        "required_information": [
+          "Enter in 'add service' and click the [Update Account] button.",
+          "Explain to the customer that their service has been reinstated."
+        ]
+      },
+      {
+        "sequence": 6,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Check that the service is now operational.  (i.e. 'Can you see the service properly activated on your account now?')",
+        "required_information": [
+          "If they say yes, then wonderful! You are done.",
+          "If they say no, then tell them it may take a few minutes.  Then proceed to ask if they need anything else."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "manage_account__status_shipping_question",
+    "domain": "Manage Account",
+    "intent": "Status Shipping Question",
+    "customer_goal": "Status Shipping Question",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": []
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Send Link",
+        "instruction": "x",
+        "required_information": []
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "manage_account__status_credit_missing",
+    "domain": "Manage Account",
+    "intent": "Status Credit Missing",
+    "customer_goal": "Status Credit Missing",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Find out where the credits originated from.  Apologize for any inconvenience.",
+        "required_information": [
+          "Options include ['subscription refund', 'previous purchase', 'promotional package']",
+          "Enter this into the input box and [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "Check if missing credit is accurate by 'Asking the Oracle' which will return Yes or No",
+          "Make sure to explain the result in natural language."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "If the credit is not missing (Oracle returns No) , then it is a problem in the Customer Interface",
+        "required_information": [
+          "Please tell them to log out and log back in again, or something similar.",
+          "Assure the customer that their credit shows up on your side.",
+          "Feel free to end the conversation."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Promo Code",
+        "instruction": "If the credit is missing (Oracle returns Yes):",
+        "required_information": [
+          "Ask for how much credit to add to the customer’s account.  If the customer does not know, the standard amount is $40.",
+          "Enter in the amount and click [Promo Code]",
+          "Send the generated promo code to the customer."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "manage_account__manage_change_address",
+    "domain": "Manage Account",
+    "intent": "Manage Change Address",
+    "customer_goal": "Manage Change Address",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "If they are trying to change address on the account, they must be able to provide their current address.",
+        "required_information": [
+          "You only need the street address",
+          "For example, if they live at '7221 Florshim Drive, San Carlos, CA 91207', then you only need the part of '7221 Florshim Drive'",
+          "Enter this information into [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Verify the identity of the customer.  They must provide 3 out of 7 of the items below which you you enter into [Verify Identity]",
+        "required_information": [
+          "Zip Code",
+          "Telephone Number",
+          "PIN Number",
+          "Username",
+          "Password",
+          "Email Address",
+          "Order ID of previous purchase"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Update Account",
+        "instruction": "Ask for the new, desired value.",
+        "required_information": [
+          "Again, you only need the street address > For example '7226 Florishim Drive'",
+          "Enter this info and select [Update Account]",
+          "Tell them everything has been updated in the system"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "manage_account__manage_change_name",
+    "domain": "Manage Account",
+    "intent": "Manage Change Name",
+    "customer_goal": "Manage Change Name",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "If they are trying to change the name on the account, they must be able to provide their current full name.",
+        "required_information": [
+          "Get the current first and last name, such as 'George Constanza'",
+          "Enter this information and click [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Verify the identity of the customer.  They must provide 3 out of 7 of the items below which you you enter into [Verify Identity]",
+        "required_information": [
+          "Zip Code",
+          "Telephone Number",
+          "PIN Number",
+          "Username",
+          "Password",
+          "Email Address",
+          "Order ID of previous purchase"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Update Account",
+        "instruction": "Ask for the new, desired value.",
+        "required_information": [
+          "For example 'Jerry Seinfeld'",
+          "Enter this info and select [Update Account]",
+          "Tell them everything has been updated in the system"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "manage_account__manage_change_phone",
+    "domain": "Manage Account",
+    "intent": "Manage Change Phone",
+    "customer_goal": "Manage Change Phone",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "To change the phone number, they must be able to provide their current number.",
+        "required_information": [
+          "Format should be (XXX) XXX-XXXX",
+          "Enter this information and click [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Verify the identity of the customer.  They must provide 3 out of 7 of the items below which you you enter into [Verify Identity]",
+        "required_information": [
+          "Zip Code",
+          "Telephone Number",
+          "PIN Number",
+          "Username",
+          "Password",
+          "Email Address",
+          "Order ID of previous purchase"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Update Account",
+        "instruction": "Ask for the new, desired value. Format should be (XXX) XXX-XXXX",
+        "required_information": [
+          "Enter this info and select [Update Account]",
+          "Tell them everything has been updated in the system"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "manage_account__manage_payment_method",
+    "domain": "Manage Account",
+    "intent": "Manage Payment Method",
+    "customer_goal": "Manage Payment Method",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "To change payment method, ask for their current payment method",
+        "required_information": [
+          "Options include ['credit card', 'debit card', 'paypal']",
+          "Enter this information and click [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Verify the identity of the customer.  They must provide 3 out of 7 of the items below which you you enter into [Verify Identity]",
+        "required_information": [
+          "Zip Code",
+          "Telephone Number",
+          "PIN Number",
+          "Username",
+          "Password",
+          "Email Address",
+          "Order ID of previous purchase"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Update Account",
+        "instruction": "Ask for the new, desired value.",
+        "required_information": [
+          "Options include ['credit card', 'debit card', 'paypal']",
+          "Enter this info and select [Update Account]",
+          "Tell them everything has been updated in the system"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "purchase_dispute__bad_price_competitor",
+    "domain": "Purchase Dispute",
+    "intent": "Bad Price Competitor",
+    "customer_goal": "Bad Price Competitor",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID .",
+        "required_information": [
+          "This loads information in the background related to this user."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Find out why they are disputing a purchase price",
+        "required_information": [
+          "Either 'competitor' or 'yesterday'",
+          "Enter this into the input box and [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Check if this is a valid order by gathering the following info, then [Verify Identity]",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Try to convince the customer that sometimes the prices change, and that is outside of your control.",
+        "required_information": [
+          "For example, Our pricing algorithms will often dynamically change the price of an item."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "kb query",
+        "action": "Promo Code",
+        "instruction": "If they are still unhappy:",
+        "required_information": [
+          "If the customer keeps pushing, offer them a discount using [Promo Code]",
+          "You do not need to enter any information.",
+          "Generate the code and share that with them"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "purchase_dispute__bad_price_yesterday",
+    "domain": "Purchase Dispute",
+    "intent": "Bad Price Yesterday",
+    "customer_goal": "Bad Price Yesterday",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID .",
+        "required_information": [
+          "This loads information in the background related to this user."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Find out why they are disputing a purchase price",
+        "required_information": [
+          "Either 'competitor' or 'yesterday'",
+          "Enter this into the input box and [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Check if this is a valid order by gathering the following info, then [Verify Identity]",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Try to convince the customer that sometimes the prices change, and that is outside of your control.",
+        "required_information": [
+          "For example, Our pricing algorithms will often dynamically change the price of an item."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "kb query",
+        "action": "Promo Code",
+        "instruction": "If they are still unhappy:",
+        "required_information": [
+          "If the customer keeps pushing, offer them a discount using [Promo Code]",
+          "You do not need to enter any information.",
+          "Generate the code and share that with them"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "purchase_dispute__out-of-stock_general",
+    "domain": "Purchase Dispute",
+    "intent": "Out-of-Stock General",
+    "customer_goal": "Out-of-Stock General",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Notify Internal Team",
+        "instruction": "Let the customer know that you will write up a report and let the Purchasing Department know about this, so they can do a better job.",
+        "required_information": [
+          "Enter 'purchasing department' into the input box and [Notify Internal Team]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Check if the customer is satisfied",
+        "required_information": []
+      },
+      {
+        "sequence": 4,
+        "type": "kb query",
+        "action": "Promo Code",
+        "instruction": "If they are still unhappy:",
+        "required_information": [
+          "If the customer keeps pushing, offer them a discount using [Promo Code]",
+          "You do not need to enter any information.",
+          "Generate the code and share that with them"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "purchase_dispute__out-of-stock_one_item",
+    "domain": "Purchase Dispute",
+    "intent": "Out-of-Stock One Item",
+    "customer_goal": "Out-of-Stock One Item",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Find out which item they are unhappy about",
+        "required_information": [
+          "Get the brand and type, such as 'Gap Sweater' or 'Uniqlo Socks'",
+          "Enter this into the input box and [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Notify Internal Team",
+        "instruction": "Let the customer know that you will write up a report and let the Purchasing Department know about this, so they can do a better job.",
+        "required_information": [
+          "Enter 'purchasing department' into the input box and [Notify Internal Team]"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Make Purchase",
+        "instruction": "If the customer is still not satisfied with the outcome, then offer to make the order for the customer",
+        "required_information": [
+          "Let the customer know that you can back-order the item for them.  The item will then ship immediately when it becomes available.",
+          "To proceed, enter the brand and item, such as 'Express Jeans' or 'Banana Republic Shirt' into the input box",
+          "Confirm that you should use the same credit card that is on file.",
+          "Lastly, select [Make Purchase]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "purchase_dispute__promo_code_invalid",
+    "domain": "Purchase Dispute",
+    "intent": "Promo Code Invalid",
+    "customer_goal": "Promo Code Invalid",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Typically promotions only last 7 days so check if the code was issued a long time ago.   That might be the reason it doesn’t work.",
+        "required_information": [
+          "If the promo code is more than 7 days, then the correct subflow is 'out of date', otherwise, the correct subflow is 'invalid'",
+          "Both flows follow the same instructions below."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "Tell the customer you will check your system about this problem.",
+          "Then [Ask the Oracle] if the customer made an error, which will return Yes or No",
+          "Make sure to explain the result in natural language.",
+          "If the customer is right (Oracle says Yes), skip to the Promo Code step below"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "If the customer is wrong (Oracle says No), then:",
+        "required_information": [
+          "Ask the customer for their membership level.",
+          "Enter the member level (even if just a Guest) into [Membership Privileges] and submit.",
+          "Gold, Silver and Bronze all qualify. > The idea here is that even if their promo code is not valid for whatever reason, we will generate a new one for them because they are a valued member.",
+          "Guest > If they are just a regular user, then apologize that you cannot help them because there is nothing you can do"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Promo Code",
+        "instruction": "Generate the promo code and share that with them",
+        "required_information": [
+          "No need to enter anything into the form.",
+          "Click on [Promo Code]",
+          "If the customer asks, you can say it is for 20% off their next purchase."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "purchase_dispute__promo_code_out_of_date",
+    "domain": "Purchase Dispute",
+    "intent": "Promo Code Out of Date",
+    "customer_goal": "Promo Code Out of Date",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Typically promotions only last 7 days so check if the code was issued a long time ago.   That might be the reason it doesn’t work.",
+        "required_information": [
+          "If the promo code is more than 7 days, then the correct subflow is 'out of date', otherwise, the correct subflow is 'invalid'",
+          "Both flows follow the same instructions below."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "Tell the customer you will check your system about this problem.",
+          "Then [Ask the Oracle] if the customer made an error, which will return Yes or No",
+          "Make sure to explain the result in natural language.",
+          "If the customer is right (Oracle says Yes), skip to the Promo Code step below"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "If the customer is wrong (Oracle says No), then:",
+        "required_information": [
+          "Ask the customer for their membership level.",
+          "Enter the member level (even if just a Guest) into [Membership Privileges] and submit.",
+          "Gold, Silver and Bronze all qualify. > The idea here is that even if their promo code is not valid for whatever reason, we will generate a new one for them because they are a valued member.",
+          "Guest > If they are just a regular user, then apologize that you cannot help them because there is nothing you can do"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Promo Code",
+        "instruction": "Generate the promo code and share that with them",
+        "required_information": [
+          "No need to enter anything into the form.",
+          "Click on [Promo Code]",
+          "If the customer asks, you can say it is for 20% off their next purchase."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "purchase_dispute__mistimed_billing_already_returned",
+    "domain": "Purchase Dispute",
+    "intent": "Mistimed Billing Already Returned",
+    "customer_goal": "Mistimed Billing Already Returned",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "[Validate Purchase] to confirm that they have a valid order:",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "Decide whether or not this is a valid error by checking the time frame.",
+        "required_information": [
+          "Ask how long the customer has waited for the refund to show up, in days",
+          "Enter this amount in [Record Reason]",
+          "If the customer is right (more than 7 days), skip to the Update Order step below"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "If it has not been long enough (less than 7 days), then:",
+        "required_information": [
+          "Ask the customer for their membership level and enter into [Membership Privileges]",
+          "This only works for Gold members. > The company risks paying back the customer twice by issuing two refunds, but we do this anyway because we really value our Gold Members.",
+          "For all other members > Unfortunately you cannot help them on this issue.  Do not update order."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "If this is a company error or a Gold member, then start processing the credit.",
+        "required_information": [
+          "Type in 'give credit' into the field",
+          "Then click on [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "purchase_dispute__mistimed_billing_never_bought",
+    "domain": "Purchase Dispute",
+    "intent": "Mistimed Billing Never Bought",
+    "customer_goal": "Mistimed Billing Never Bought",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "[Validate Purchase] to confirm that they have a valid order:",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "To decide whether or not this is a valid error:",
+        "required_information": [
+          "[Ask the Oracle] if the customer made an error, which will return Yes or No",
+          "If the customer is right (Oracle says Yes), skip to the Update Order step below"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "If the customer is wrong (Oracle says No), then:",
+        "required_information": [
+          "Ask the customer for their membership level and enter into [Membership Privileges]",
+          "This only works for Gold members. > Even if the system says that this is a customer error, we value our Gold members really highly so we will just give them the credit anyway. > If it is already returned, then the company risks paying back the customer twice. > If the customer never bought the item, the company risks refunding the customer even though the customer was never charged in the first place.",
+          "For all other members > Unfortunately you cannot help them on this issue.  Do not update order."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "If this is a company error or a Gold member, then start processing the credit.",
+        "required_information": [
+          "Type in 'give credit' into the field",
+          "Then click on [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "shipping_issue__shipping_status",
+    "domain": "Shipping Issue",
+    "intent": "Shipping Status",
+    "customer_goal": "Shipping Status",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID .",
+        "required_information": [
+          "This loads information in the background related to this user."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "To confirm that their purchase is valid :",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "Ask the Oracle",
+        "required_information": [
+          "The customer will ask some sort of of yes/no question, which you can query the Oracle to get the answer",
+          "Explain the answer in natural language, and feel free to add any creative explanations or background."
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "If the Oracle says Yes, then you can confirm that the customer’s order looks as expected and the email was incorrect",
+        "required_information": []
+      },
+      {
+        "sequence": 6,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "If the Oracle says No, then the customer will not be happy. To resolve, enter how you will fix the problem",
+        "required_information": [
+          "Options include: 'change date', 'change address', 'change item', or 'change price'",
+          "Enter into [Update Order]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "shipping_issue__manage_shipping",
+    "domain": "Shipping Issue",
+    "intent": "Manage Shipping",
+    "customer_goal": "Manage Shipping",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "Start by gathering the shipping status from the customer",
+        "required_information": [
+          "Options include: 'Order Received',  'In Transit', 'Out for Delivery', or 'Delivered'",
+          "This should input using [Shipping Status]"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "To confirm that their purchase is valid :",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "Finally, perform the action for the customer by updating their order",
+        "required_information": [
+          "Enter the type of change they want to make: > Options: 'Change address' or 'Change order'",
+          "Then click the [Update Order] button"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "shipping_issue__missing_item",
+    "domain": "Shipping Issue",
+    "intent": "Missing Item",
+    "customer_goal": "Missing Item",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "To confirm that their purchase is valid :",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Record Reason",
+        "instruction": "When shipping items, it can often take a couple days for the product to arrive",
+        "required_information": [
+          "Ask how long they have been waiting and enter the number of days into [Record Reason]"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "If they have been waiting for less than a week (7 days or less), let the customer know that sometimes the package is mistakenly marked as delivered, but can still take a couple days to arrive",
+        "required_information": []
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "If the customer date has been waiting for a week or longer, let them know that you will ship a new order.",
+        "required_information": [
+          "To do this, you will need their address",
+          "Enter the full address in one line and then click [Update Order]"
+        ]
+      },
+      {
+        "sequence": 6,
+        "type": "interaction",
+        "action": "Make Purchase",
+        "instruction": "Finally resend the package",
+        "required_information": [
+          "Ask the customer for the brand and type of the product, such as 'Guess Jeans'",
+          "Enter this value into the form",
+          "Then click the [Make Purchase] button"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "shipping_issue__shipping_cost",
+    "domain": "Shipping Issue",
+    "intent": "Shipping Cost",
+    "customer_goal": "Shipping Cost",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Validate Purchase",
+        "instruction": "Start by confirming that their purchase is valid :",
+        "required_information": [
+          "Username - occasionally, the customer may not remember their username.  In this case, use the Recover Username subflow in the Account Access flow",
+          "Email Address",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Shipping Status",
+        "instruction": "Then, check to see status of their delivery",
+        "required_information": [
+          "Ask the customer for the shipping status",
+          "Options include: 'Order Received',  'In Transit', 'Out for Delivery', or 'Delivered' ",
+          "Record the status using [Shipping Status]"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Update Order",
+        "instruction": "If the status is 'Order Received' or  'In Transit', then offer to waive the fee on their shipment",
+        "required_information": [
+          "Enter 'waive fee' in the input form",
+          "Click on [Update Order]",
+          "Wrap up and end the conversation"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Offer Refund",
+        "instruction": "Alternatively, if the status is 'Out for Delivery' or 'Delivered', then the best you can do is to give them part of the shipping fee back.",
+        "required_information": [
+          "Standard shipping is $8.00, so enter '8' into the box",
+          "Then click on [Offer Refund]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "subscription_inquiry__status_active",
+    "domain": "Subscription Inquiry",
+    "intent": "Status Active",
+    "customer_goal": "Status Active",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID .",
+        "required_information": [
+          "This loads information in the background related to this user."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Subscription Status",
+        "instruction": "Find out the status by  action",
+        "required_information": [
+          "You do not need to enter anything into the form. Just click the button.",
+          "This will return the general results, including whether or not the subscription is active or cancelled, as well as the due amount and the due date.",
+          "If the status does not make sense (ie. bill due today but amount due of $0), feel free to adjust the values (i.e make it $20 instead) so the story is reasonable.",
+          "You should then translate this into natural language to explain the details."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Send Link",
+        "instruction": "Provide a link to their account so they can look this up themselves in the future.",
+        "required_information": [
+          "This is accomplished with the [Send Link] button.  You can put 'account login' as the text.  Explain that this is the link for signing into their account.",
+          "Make sure they know their own username.  Provide it to them if they don’t.  You can make up their username as the first letter of first name + last name + 1 > For example: Howard Chen → hchen1"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "communication",
+        "action": "Enter Detail",
+        "instruction": "Optional Step",
+        "required_information": [
+          "Especially if the subscription is not active or past due, the customer will want to pay the bill.  In this case, get the amount and input into [Enter Detail]."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "subscription_inquiry__status_due_amount",
+    "domain": "Subscription Inquiry",
+    "intent": "Status Due Amount",
+    "customer_goal": "Status Due Amount",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID .",
+        "required_information": [
+          "This loads information in the background related to this user."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Subscription Status",
+        "instruction": "Find out the status by  action",
+        "required_information": [
+          "You do not need to enter anything into the form. Just click the button.",
+          "This will return the general results, including whether or not the subscription is active or cancelled, as well as the due amount and the due date.",
+          "If the status does not make sense (ie. bill due today but amount due of $0), feel free to adjust the values (i.e make it $20 instead) so the story is reasonable.",
+          "You should then translate this into natural language to explain the details."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Send Link",
+        "instruction": "Provide a link to their account so they can look this up themselves in the future.",
+        "required_information": [
+          "This is accomplished with the [Send Link] button.  You can put 'account login' as the text.  Explain that this is the link for signing into their account.",
+          "Make sure they know their own username.  Provide it to them if they don’t.  You can make up their username as the first letter of first name + last name + 1 > For example: Howard Chen → hchen1"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "communication",
+        "action": "Enter Detail",
+        "instruction": "Optional Step",
+        "required_information": [
+          "Especially if the subscription is not active or past due, the customer will want to pay the bill.  In this case, get the amount and input into [Enter Detail]."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "subscription_inquiry__status_due_date",
+    "domain": "Subscription Inquiry",
+    "intent": "Status Due Date",
+    "customer_goal": "Status Due Date",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "All chats in this flow start by asking the customer for their full name or Account ID .",
+        "required_information": [
+          "This loads information in the background related to this user."
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "kb query",
+        "action": "Subscription Status",
+        "instruction": "Find out the status by  action",
+        "required_information": [
+          "You do not need to enter anything into the form. Just click the button.",
+          "This will return the general results, including whether or not the subscription is active or cancelled, as well as the due amount and the due date.",
+          "If the status does not make sense (ie. bill due today but amount due of $0), feel free to adjust the values (i.e make it $20 instead) so the story is reasonable.",
+          "You should then translate this into natural language to explain the details."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Send Link",
+        "instruction": "Provide a link to their account so they can look this up themselves in the future.",
+        "required_information": [
+          "This is accomplished with the [Send Link] button.  You can put 'account login' as the text.  Explain that this is the link for signing into their account.",
+          "Make sure they know their own username.  Provide it to them if they don’t.  You can make up their username as the first letter of first name + last name + 1 > For example: Howard Chen → hchen1"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "communication",
+        "action": "Enter Detail",
+        "instruction": "Optional Step",
+        "required_information": [
+          "Especially if the subscription is not active or past due, the customer will want to pay the bill.  In this case, get the amount and input into [Enter Detail]."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "subscription_inquiry__manage_pay_bill",
+    "domain": "Subscription Inquiry",
+    "intent": "Manage Pay Bill",
+    "customer_goal": "Manage Pay Bill",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "interaction",
+        "action": "Enter Detail",
+        "instruction": "The standard subscription is $99 a year.  Find out how much of this the customer wants to pay.",
+        "required_information": [
+          "If the customer does not know the amount, you can click go to KB Query > [Subscription Status] to generate a random amount due.  Explain to the customer that this is what they need to pay.",
+          "If this value is $0, make it $99 instead so it makes sense.",
+          "Once you have a number enter that value into [Enter Detail]"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "Ask if the customer has a credit card number.  If they do not, tell them you will use the credit card on the account",
+        "required_information": []
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Update Account",
+        "instruction": "Finalize their subscription payment",
+        "required_information": [
+          "Enter the value of 'renew subscription'",
+          "Click the [Update Account] button"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "subscription_inquiry__manage_extension",
+    "domain": "Subscription Inquiry",
+    "intent": "Manage Extension",
+    "customer_goal": "Manage Extension",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Whether or not they get an extension depends on the membership level",
+        "required_information": [
+          "Enter the member level (Gold, Silver, Bronze or Guest) into [Membership Privileges]",
+          "Gold members can always get an extension",
+          "Silver member get an extension if they are only 1 day late",
+          "Bronze and Guest members cannot get an extension > For these, apologize that you cannot do anything for them."
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "interaction",
+        "action": "Update Account",
+        "instruction": "(Option A) If they get an extension",
+        "required_information": [
+          "Enter 'extend subscription' into [Update Account]",
+          "Then ask if they need anything else and wrap up the conversation"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Enter Details",
+        "instruction": "(Option B) If they do not get an extension and escalate to the manager",
+        "required_information": [
+          "Ask for their phone number so they have a number you can call them on",
+          "Put the phone number into [Enter Details]",
+          "Then let them know, the manager will call them back later",
+          "Enter 'manager' into the [Notify Internal Team] action",
+          "Finally, ask if they need anything else and end the conversation"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "subscription_inquiry__manage_dispute_bill",
+    "domain": "Subscription Inquiry",
+    "intent": "Manage Dispute Bill",
+    "customer_goal": "Manage Dispute Bill",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "interaction",
+        "action": "Pull up Account",
+        "instruction": "Get Full Name or Account ID for [Pull up Account]",
+        "required_information": []
+      },
+      {
+        "sequence": 2,
+        "type": "kb query",
+        "action": "Verify Identity",
+        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
+        "required_information": [
+          "Full name - may have gotten this earlier",
+          "Account ID - may have gotten this earlier",
+          "Order ID"
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Membership Privileges",
+        "instruction": "Whether or not they get an refund depends on the membership level",
+        "required_information": [
+          "Enter the member level (Gold, Silver, Bronze or Guest) into [Membership Privileges]",
+          "Gold members can always get what they want ",
+          "Silver member get a refund if the amount wrong is less than $10",
+          "Bronze and Guest members depend on checking the system (see next step)"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "kb query",
+        "action": "Ask the Oracle",
+        "instruction": "If Bronze or Guest members, you need to [Ask the Oracle]",
+        "required_information": [
+          "If the Oracle says Yes, then they still get the refund",
+          "If the Oracle says No, then the customer does not get the refund"
+        ]
+      },
+      {
+        "sequence": 5,
+        "type": "interaction",
+        "action": "Offer Refund",
+        "instruction": "Find out how much the customer is asking for",
+        "required_information": [
+          "If they are supposed to be charged $50 and the bill was $60, then the refund amount should be $10",
+          "Perhaps they are just complaining because the bill was high, but they haven’t actually paid it yet.  In this case, just apologize for the misunderstanding.",
+          "However, perhaps they already paid the bill.  In this case, enter the correct amount (for example '10') and select [Offer Refund]"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "single-item_query__boots_faq",
+    "domain": "Single-Item Query",
+    "intent": "Boots FAQ",
+    "customer_goal": "Boots FAQ",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "required_information": [
+          "This will swap out for a different view that has FAQ content",
+          "If you made an error, just click [Hide FAQ] to switch back"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Boots",
+        "instruction": "Decide which article of clothing the customer is asking about:",
+        "required_information": [
+          "Possible options are Jeans, Shirt, Boots and Jacket",
+          "Click the boots toggle switch",
+          "This will record an action, so try to get this decision correct",
+          "The flow diagram allows you to see all the questions at once."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Select Answer",
+        "instruction": "Read through the list of 8 options",
+        "required_information": [
+          "Select the correct answer for the customer’s question with [Select Answer]",
+          "Remember the question your selected for the survey later"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "The system created response does not include all the information, so make sure to explain the details in natural language.",
+        "required_information": [
+          "Do not copy/paste."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "single-item_query__shirt_faq",
+    "domain": "Single-Item Query",
+    "intent": "Shirt FAQ",
+    "customer_goal": "Shirt FAQ",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "required_information": [
+          "This will swap out for a different view that has FAQ content",
+          "If you made an error, just click [Hide FAQ] to switch back"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Shirt",
+        "instruction": "Decide which article of clothing the customer is asking about:",
+        "required_information": [
+          "Possible options are Jeans, Shirt, Boots and Jacket",
+          "Click the shirt toggle switch",
+          "This will record an action, so try to get this decision correct",
+          "The flow diagram allows you to see all the questions at once."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Select Answer",
+        "instruction": "Read through the list of 8 options",
+        "required_information": [
+          "Select the correct answer for the customer’s question with [Select Answer]",
+          "Remember the question your selected for the survey later"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "The system created response does not include all the information, so make sure to explain the details in natural language.",
+        "required_information": [
+          "Do not copy/paste."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "single-item_query__jeans_faq",
+    "domain": "Single-Item Query",
+    "intent": "Jeans FAQ",
+    "customer_goal": "Jeans FAQ",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "required_information": [
+          "This will swap out for a different view that has FAQ content",
+          "If you made an error, just click [Hide FAQ] to switch back"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Jeans",
+        "instruction": "Decide which article of clothing the customer is asking about:",
+        "required_information": [
+          "Possible options are Jeans, Shirt, Boots and Jacket",
+          "Click the jeans toggle switch",
+          "This will record an action, so try to get this decision correct",
+          "The flow diagram allows you to see all the questions at once."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Select Answer",
+        "instruction": "Read through the list of 8 options",
+        "required_information": [
+          "Select the correct answer for the customer’s question with [Select Answer]",
+          "Remember the question your selected for the survey later"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "The system created response does not include all the information, so make sure to explain the details in natural language.",
+        "required_information": [
+          "Do not copy/paste."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "single-item_query__jacket_faq",
+    "domain": "Single-Item Query",
+    "intent": "Jacket FAQ",
+    "customer_goal": "Jacket FAQ",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "required_information": [
+          "This will swap out for a different view that has FAQ content",
+          "If you made an error, just click [Hide FAQ] to switch back"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Jacket",
+        "instruction": "Decide which article of clothing the customer is asking about:",
+        "required_information": [
+          "Possible options are Jeans, Shirt, Boots and Jacket",
+          "Click the jacket toggle switch",
+          "This will record an action, so try to get this decision correct",
+          "The flow diagram allows you to see all the questions at once."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Select Answer",
+        "instruction": "Read through the list of 8 options",
+        "required_information": [
+          "Select the correct answer for the customer’s question with [Select Answer]",
+          "Remember the question your selected for the survey later"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "The system created response does not include all the information, so make sure to explain the details in natural language.",
+        "required_information": [
+          "Do not copy/paste."
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "storewide_query__pricing_faq",
+    "domain": "Storewide Query",
+    "intent": "Pricing FAQ",
+    "customer_goal": "Pricing FAQ",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "required_information": [
+          "This will swap out for a different view that has FAQ content",
+          "If you made an error, just click [Hide FAQ] to switch back"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Pricing",
+        "instruction": "Decide which kind of question the customer is asking about:",
+        "required_information": [
+          "Possible options are Pricing, Timing, Membership and Policies",
+          "Click the pricing toggle switch",
+          "This will record an action, so try to get this decision correct.",
+          "The flow diagram allows you to see all the questions at once."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Select Answer",
+        "instruction": "Read through the list of 4 options",
+        "required_information": [
+          "Click [Select Answer] for the correct answer to the customer’s question",
+          "Remember the category for the survey later"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "The automated system response does not include all the information, so make sure to explain the details in natural language.",
+        "required_information": [
+          "You should not copy/paste"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "storewide_query__membership_faq",
+    "domain": "Storewide Query",
+    "intent": "Membership FAQ",
+    "customer_goal": "Membership FAQ",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "required_information": [
+          "This will swap out for a different view that has FAQ content",
+          "If you made an error, just click [Hide FAQ] to switch back"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Membership",
+        "instruction": "Decide which kind of question the customer is asking about:",
+        "required_information": [
+          "Possible options are Pricing, Timing, Membership and Policies",
+          "Click the membership toggle switch",
+          "This will record an action, so try to get this decision correct.",
+          "The flow diagram allows you to see all the questions at once."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Select Answer",
+        "instruction": "Read through the list of 4 options",
+        "required_information": [
+          "Click [Select Answer] for the correct answer to the customer’s question",
+          "Remember the category for the survey later"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "The automated system response does not include all the information, so make sure to explain the details in natural language.",
+        "required_information": [
+          "You should not copy/paste"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "storewide_query__timing_faq",
+    "domain": "Storewide Query",
+    "intent": "Timing FAQ",
+    "customer_goal": "Timing FAQ",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "required_information": [
+          "This will swap out for a different view that has FAQ content",
+          "If you made an error, just click [Hide FAQ] to switch back"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Timing",
+        "instruction": "Decide which kind of question the customer is asking about:",
+        "required_information": [
+          "Possible options are Pricing, Timing, Membership and Policies",
+          "Click the timing toggle switch",
+          "This will record an action, so try to get this decision correct.",
+          "The flow diagram allows you to see all the questions at once."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Select Answer",
+        "instruction": "Read through the list of 4 options",
+        "required_information": [
+          "Click [Select Answer] for the correct answer to the customer’s question",
+          "Remember the category for the survey later"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "The automated system response does not include all the information, so make sure to explain the details in natural language.",
+        "required_information": [
+          "You should not copy/paste"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  },
+  {
+    "id": "storewide_query__policy_faq",
+    "domain": "Storewide Query",
+    "intent": "Policy FAQ",
+    "customer_goal": "Policy FAQ",
+    "workflow": [
+      {
+        "sequence": 1,
+        "type": "faq/policy",
+        "action": "Search FAQ",
+        "instruction": "When you realize that the customer is asking something that can be found in the FAQ, click the [Search FAQ] button",
+        "required_information": [
+          "This will swap out for a different view that has FAQ content",
+          "If you made an error, just click [Hide FAQ] to switch back"
+        ]
+      },
+      {
+        "sequence": 2,
+        "type": "faq/policy",
+        "action": "Policy",
+        "instruction": "Decide which kind of question the customer is asking about:",
+        "required_information": [
+          "Possible options are Pricing, Timing, Membership and Policies",
+          "Click the policy toggle switch",
+          "This will record an action, so try to get this decision correct.",
+          "The flow diagram allows you to see all the questions at once."
+        ]
+      },
+      {
+        "sequence": 3,
+        "type": "faq/policy",
+        "action": "Select Answer",
+        "instruction": "Read through the list of 4 options",
+        "required_information": [
+          "Click [Select Answer] for the correct answer to the customer’s question",
+          "Remember the category for the survey later"
+        ]
+      },
+      {
+        "sequence": 4,
+        "type": "communication",
+        "action": "N/A",
+        "instruction": "The automated system response does not include all the information, so make sure to explain the details in natural language.",
+        "required_information": [
+          "You should not copy/paste"
+        ]
+      }
+    ],
+    "response_policy": {
+      "be_concise": true,
+      "do_not_reference_other_flows": true,
+      "ask_for_missing_required_information": true,
+      "confirm_action_before_completion": true
+    }
+  }
+]
