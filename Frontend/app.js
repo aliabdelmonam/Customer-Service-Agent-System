@@ -251,10 +251,13 @@ async function send() {
       sessionId = data.session_id;
     }
 
-    const reply =
-      data.response || data.answer || data.message || data.reply || data.text;
+    const replies = Array.isArray(data.messages) && data.messages.length
+      ? data.messages
+      : [data.response || data.answer || data.message || data.reply || data.text];
 
-    addBotMessage(reply || JSON.stringify(data, null, 2), text);
+    replies
+      .filter((reply) => typeof reply === "string" && reply.trim())
+      .forEach((reply) => addBotMessage(reply, text));
   } catch (err) {
     hideTyping();
     if (err.name === "TypeError" && err.message === "Failed to fetch") {
