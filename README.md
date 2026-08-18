@@ -1,5 +1,5 @@
 #
 run 
 ```
-python -m src."LLM providers".llm_factory
+uvicorn src.main:app --reload
 ```
