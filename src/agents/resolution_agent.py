@@ -27,6 +27,7 @@ the remaining 53 subflows — the shape (slot/check/action/response, per-slot
 from __future__ import annotations
 
 import json
+import re
 import uuid
 from datetime import datetime, timezone
 from enum import Enum
@@ -572,7 +573,37 @@ class ResolutionAgent:
         try:
             return SlotExtraction.model_validate_json(response.text)
         except (ValidationError, json.JSONDecodeError) as exc:
+            recovered = self._recover_slot_extraction(response.text)
+            if recovered is not None:
+                return recovered
             raise ValueError(f"Provider returned invalid extraction JSON: {response.text!r}") from exc
+
+    @staticmethod
+    def _recover_slot_extraction(text: str) -> Optional[SlotExtraction]:
+        """Recover the useful fields when a provider truncates malformed JSON.
+
+        Some models occasionally emit a valid ``found`` and quoted ``value``
+        and then run on while writing ``confidence``. Confidence is audit-only,
+        never used for workflow control, so a complete found/value pair can be
+        safely recovered without guessing a customer value.
+        """
+        found_match = re.search(r'"found"\s*:\s*(true|false)', text, re.IGNORECASE)
+        if found_match is None:
+            return None
+        found = found_match.group(1).lower() == "true"
+        if not found:
+            return SlotExtraction(found=False, value=None, confidence=1.0)
+
+        value_match = re.search(r'"value"\s*:\s*("(?:\\.|[^"\\])*")', text)
+        if value_match is None:
+            return None
+        try:
+            value = json.loads(value_match.group(1))
+        except json.JSONDecodeError:
+            return None
+        if not isinstance(value, str) or not value:
+            return None
+        return SlotExtraction(found=True, value=value, confidence=1.0)
 
     async def _phrase(
         self,

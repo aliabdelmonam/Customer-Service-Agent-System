@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Any, Awaitable, Callable
 
 
-FunctionResult = dict[str, Any]
+FunctionResult = Any
 ResolutionFunction = Callable[[dict[str, Any]], Awaitable[FunctionResult]]
 
 
@@ -37,7 +37,9 @@ async def ask_the_oracle(slots: dict[str, Any]) -> FunctionResult:
 
 
 async def shipping_status(slots: dict[str, Any]) -> FunctionResult:
-    return _placeholder("shipping_status", slots, shipping_status="unknown")
+    # Replace with an order-service lookup. This scalar is intentionally
+    # returned directly because CheckStep compares it to "not_shipped".
+    return "not_shipped"
 
 
 async def update_account(slots: dict[str, Any]) -> FunctionResult:
@@ -97,7 +99,9 @@ async def try_again(slots: dict[str, Any]) -> FunctionResult:
 
 
 async def membership_privileges(slots: dict[str, Any]) -> FunctionResult:
-    return _placeholder("membership_privileges", slots, privileges=[])
+    # Replace with a membership-service lookup. This boolean is consumed by
+    # CheckStep using the IS_TRUE operator.
+    return True
 
 
 async def jacket(slots: dict[str, Any]) -> FunctionResult:

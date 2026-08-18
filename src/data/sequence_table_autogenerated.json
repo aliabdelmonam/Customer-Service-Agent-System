@@ -535,43 +535,21 @@
   {
     "flow": "Order Issue",
     "subflow": "Manage Cancel",
-    "steps": [
-      {
-        "step_type": "slot",
-        "label": "Pull up Account",
-        "instruction": "Get Full Name or Account ID for [Pull up Account]",
-        "source_raw_type": "interaction",
-        "review_needed": true
-      },
-      {
-        "step_type": "action",
-        "label": "Verify Identity",
-        "instruction": "Start by looking up the order using the [Verify Identity] fields.",
-        "source_raw_type": "kb query",
-        "review_needed": false
-      },
-      {
-        "step_type": "slot",
-        "label": "Shipping Status",
-        "instruction": "Find out whether the item has already shipped.",
-        "source_raw_type": "interaction",
-        "review_needed": true
-      },
-      {
-        "step_type": "check",
-        "label": "Membership Privileges",
-        "instruction": "Ask the customer for their membership level.",
-        "source_raw_type": "faq/policy",
-        "review_needed": true
-      },
-      {
-        "step_type": "slot",
-        "label": "Offer Refund",
-        "instruction": "Find out how much the item cost that is meant to be returned",
-        "source_raw_type": "interaction",
-        "review_needed": true
-      }
-    ]
+    "start_step_id": "ask_account_id",
+    "steps": {
+      "ask_account_id": {"step_id": "ask_account_id", "step_type": "slot", "instruction": "Ask the customer for their full name or account ID so you can locate their account.", "slot_name": "account_id", "source": "customer_provided", "next_step_id": "verify_identity"},
+      "verify_identity": {"step_id": "verify_identity", "step_type": "action", "instruction": "Verify the customer's identity using their account details.", "function_name": "Verify Identity", "next_step_id": "ask_order_id"},
+      "ask_order_id": {"step_id": "ask_order_id", "step_type": "slot", "instruction": "Ask for the order number the customer wants to cancel.", "slot_name": "order_id", "source": "customer_provided", "next_step_id": "get_shipping_status"},
+      "get_shipping_status": {"step_id": "get_shipping_status", "step_type": "slot", "instruction": "Check the current shipping status for the customer's order.", "slot_name": "shipping_status", "source": "system_derivable", "derive_function": "Shipping Status", "next_step_id": "check_shipping_status"},
+      "check_shipping_status": {"step_id": "check_shipping_status", "step_type": "check", "instruction": "If the order has not shipped, cancel it. Otherwise, check return eligibility.", "condition_slot": "shipping_status", "operator": "equals", "condition_value": "not_shipped", "on_true_step_id": "cancel_order", "on_false_step_id": "get_membership_privileges"},
+      "cancel_order": {"step_id": "cancel_order", "step_type": "action", "instruction": "Cancel the customer's order.", "function_name": "Update Order", "next_step_id": "confirm_cancellation"},
+      "confirm_cancellation": {"step_id": "confirm_cancellation", "step_type": "response", "instruction": "Confirm that the customer's order was cancelled and offer any further help.", "next_step_id": null},
+      "get_membership_privileges": {"step_id": "get_membership_privileges", "step_type": "slot", "instruction": "Check whether the customer's membership allows a return or refund after shipping.", "slot_name": "membership_can_return", "source": "system_derivable", "derive_function": "Membership Privileges", "next_step_id": "check_membership_privileges"},
+      "check_membership_privileges": {"step_id": "check_membership_privileges", "step_type": "check", "instruction": "Offer the return or refund path only when the customer is eligible.", "condition_slot": "membership_can_return", "operator": "is_true", "on_true_step_id": "offer_refund", "on_false_step_id": "cannot_cancel"},
+      "offer_refund": {"step_id": "offer_refund", "step_type": "action", "instruction": "Offer the eligible return or refund path for the shipped order.", "function_name": "Offer Refund", "next_step_id": "confirm_refund_path"},
+      "confirm_refund_path": {"step_id": "confirm_refund_path", "step_type": "response", "instruction": "Explain the available return or refund option and offer further help.", "next_step_id": null},
+      "cannot_cancel": {"step_id": "cannot_cancel", "step_type": "response", "instruction": "Explain with empathy that the shipped order cannot be cancelled and that no eligible return or refund path is available.", "next_step_id": null}
+    }
   },
   {
     "flow": "Account Access",
