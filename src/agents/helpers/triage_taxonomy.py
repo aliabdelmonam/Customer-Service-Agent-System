@@ -102,11 +102,3 @@ SUBFLOW_DESCRIPTIONS: dict[str, str] = {
     "Timing FAQ": "General question about store hours or processing times.",
     "Policy FAQ": "General question about store policies, such as returns or shipping.",
 }
-
-def _taxonomy_text() -> str:
-    lines: list[str] = []
-    for flow, subflows in FLOW_SUBFLOWS.items():
-        lines.append(f"\n{flow}:")
-        for subflow in subflows:
-            lines.append(f"  - {subflow}: {SUBFLOW_DESCRIPTIONS[subflow]}")
-    return "\n".join(lines)

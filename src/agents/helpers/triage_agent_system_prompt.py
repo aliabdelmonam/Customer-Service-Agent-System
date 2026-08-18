@@ -1,4 +1,15 @@
-import src.agents.helpers.triage_taxonomy as _taxonomy_text
+from src.agents.helpers.triage_taxonomy import FLOW_SUBFLOWS, SUBFLOW_DESCRIPTIONS
+
+
+def _taxonomy_text() -> str:
+    lines: list[str] = []
+    for flow, subflows in FLOW_SUBFLOWS.items():
+        lines.append(f"\n{flow}:")
+        for subflow in subflows:
+            lines.append(f"  - {subflow}: {SUBFLOW_DESCRIPTIONS[subflow]}")
+    return "\n".join(lines)
+
+
 TRIAGE_SYSTEM_PROMPT = f"""You are the triage classifier for a customer service system.
 
 STEP 1 — Determine whether the customer's latest message contains an actionable
@@ -30,3 +41,4 @@ CLASSIFICATION RULES:
 5. Never invent information about the customer's order, account, or identity.
 6. Do not answer the customer, take actions, or decide policy -- classify only.
 """
+
