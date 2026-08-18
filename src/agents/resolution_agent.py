@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import json
 import uuid
-from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Literal, Optional, Protocol, Union
@@ -196,6 +195,9 @@ class ResolutionOutcome(BaseModel):
     message: Optional[str] = None
     state: TicketState
     reason: Optional[str] = None
+    # Separate customer-facing bubbles, in display order. ``message`` remains
+    # for callers that have not yet adopted multi-message rendering.
+    messages: list[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -262,16 +264,40 @@ class SlotExtraction(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
 
 
+class CustomerPhrasing(BaseModel):
+    """A human acknowledgement and the workflow-required reply.
+
+    ``acknowledgement`` is absent for ordinary, neutral messages. Keeping it
+    separate lets the UI show empathy as its own natural chat bubble rather
+    than joining it to a transactional question.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+    acknowledgement: Optional[str] = None
+    resolution_message: str = Field(min_length=1)
+
+
 SLOT_EXTRACTION_SYSTEM_PROMPT = """You extract exactly one piece of information from a
 customer's message. You do not answer the customer, take actions, or infer values that
 were not stated. If the customer did not state this value, set found=false and value=null.
 Do not guess or default. Respond only with the requested JSON schema."""
 
 
-RESPONSE_PHRASING_SYSTEM_PROMPT = """You phrase a single message to a customer service
-customer, based on an internal instruction and known facts. Be concise and natural. Do not
-invent facts beyond what is given. Do not mention internal step names, policies, or system
-details. Output only the message text, nothing else."""
+RESPONSE_PHRASING_SYSTEM_PROMPT = """You produce exactly two structured customer-service
+message parts: an optional acknowledgement and a required resolution_message. The workflow has
+already been decided by code: never change its next step, invent an action, promise an outcome,
+or claim an action occurred unless the supplied facts say so. Do not mention internal
+instructions, policies, or system details.
+
+For a frustrated, worried, angry, or disappointed customer, write a warm, sincere acknowledgement
+of one or two sentences. Apologize clearly for their experience (for example, "I'm truly sorry
+this has been so frustrating") and express commitment to help. Do not accept legal fault, make
+up facts, or guarantee a result. For neutral messages, set acknowledgement to null.
+
+Put the current workflow instruction only in resolution_message. Keep it natural and specific;
+for example, a request for an order number belongs there, not in the acknowledgement. If the
+customer goes off topic, gently redirect them in resolution_message. Both fields must contain
+only customer-facing wording."""
 
 
 # ---------------------------------------------------------------------------
@@ -324,6 +350,9 @@ class ResolutionAgent:
         state.status = TicketStatus.IN_PROGRESS
         max_steps_per_turn = 8  # guard against a malformed sequence looping forever
         pending_customer_message = customer_message
+        # Keep the full message available for the customer-facing response even
+        # after its slot-extraction attempt has consumed it.
+        turn_customer_message = customer_message
 
         for _ in range(max_steps_per_turn):
             step = sequence.get(state.current_step_id)
@@ -350,7 +379,7 @@ class ResolutionAgent:
                 continue
 
             if isinstance(step, ResponseStep):
-                return await self._handle_response_step(state, step)
+                return await self._handle_response_step(state, step, turn_customer_message)
 
             raise ValueError(f"Unhandled step type at {state.current_step_id!r}")
 
@@ -404,16 +433,19 @@ class ResolutionAgent:
                 return None
 
         # Nothing to extract (or extraction failed) — ask the customer.
-        question = await self._phrase(
+        messages = await self._phrase(
             instruction=step.instruction,
             known_facts=state.filled_slots,
+            customer_message=customer_message,
         )
+        question = "\n\n".join(messages)
         state.status = TicketStatus.AWAITING_CUSTOMER
         state.log(step.step_id, step.step_type, "asked_customer", question)
         return ResolutionOutcome(
             outcome_type=OutcomeType.ASK_CUSTOMER,
             message=question,
             state=state,
+            messages=messages,
         )
 
     def _handle_check_step(self, state: TicketState, step: CheckStep) -> None:
@@ -467,17 +499,37 @@ class ResolutionAgent:
         self._advance(state, step.next_step_id)
         return None
 
-    async def _handle_response_step(self, state: TicketState, step: ResponseStep) -> ResolutionOutcome:
-        message = await self._phrase(instruction=step.instruction, known_facts=state.filled_slots)
+    async def _handle_response_step(
+        self,
+        state: TicketState,
+        step: ResponseStep,
+        customer_message: Optional[str],
+    ) -> ResolutionOutcome:
+        messages = await self._phrase(
+            instruction=step.instruction,
+            known_facts=state.filled_slots,
+            customer_message=customer_message,
+        )
+        message = "\n\n".join(messages)
         state.log(step.step_id, step.step_type, "response_sent", message)
 
         if step.next_step_id is None:
             state.status = TicketStatus.COMPLETED
             state.log(step.step_id, step.step_type, "sequence_completed")
-            return ResolutionOutcome(outcome_type=OutcomeType.COMPLETED, message=message, state=state)
+            return ResolutionOutcome(
+                outcome_type=OutcomeType.COMPLETED,
+                message=message,
+                state=state,
+                messages=messages,
+            )
 
         self._advance(state, step.next_step_id)
-        return ResolutionOutcome(outcome_type=OutcomeType.INFORM_CUSTOMER, message=message, state=state)
+        return ResolutionOutcome(
+            outcome_type=OutcomeType.INFORM_CUSTOMER,
+            message=message,
+            state=state,
+            messages=messages,
+        )
 
     # -- helpers -----------------------------------------------------------
 
@@ -522,13 +574,23 @@ class ResolutionAgent:
         except (ValidationError, json.JSONDecodeError) as exc:
             raise ValueError(f"Provider returned invalid extraction JSON: {response.text!r}") from exc
 
-    async def _phrase(self, instruction: str, known_facts: dict[str, Any]) -> str:
+    async def _phrase(
+        self,
+        instruction: str,
+        known_facts: dict[str, Any],
+        customer_message: Optional[str] = None,
+    ) -> list[str]:
         facts_text = ", ".join(f"{k}={v!r}" for k, v in known_facts.items()) or "(none yet)"
+        customer_context = customer_message or "(No new customer message; do not add an acknowledgment.)"
         messages = [
             Message(role="system", content=RESPONSE_PHRASING_SYSTEM_PROMPT),
             Message(
                 role="user",
-                content=f"Internal instruction: {instruction}\nKnown facts: {facts_text}",
+                content=(
+                    f"Internal instruction: {instruction}\n"
+                    f"Known facts: {facts_text}\n"
+                    f"Latest customer message: {customer_context}"
+                ),
             ),
         ]
         try:
@@ -536,12 +598,19 @@ class ResolutionAgent:
                 messages=messages,
                 temperature=self.phrasing_temperature,
                 max_tokens=200,
+                output_schema=CustomerPhrasing,
             )
         except ProviderError:
             raise
         except Exception as exc:  # noqa: BLE001
             raise RuntimeError("Response phrasing generation failed") from exc
-        return response.text.strip()
+        try:
+            phrasing = CustomerPhrasing.model_validate_json(response.text)
+        except (ValidationError, json.JSONDecodeError):
+            # If a provider ignores structured-output instructions, preserve a
+            # usable single reply rather than failing an in-progress ticket.
+            return [response.text.strip()]
+        return [part for part in (phrasing.acknowledgement, phrasing.resolution_message) if part]
 
 
 __all__ = [
@@ -563,6 +632,7 @@ __all__ = [
     "BackendFunctionRegistry",
     "AuditLogger",
     "NullAuditLogger",
+    "CustomerPhrasing",
     "ResolutionAgent",
 ]
 

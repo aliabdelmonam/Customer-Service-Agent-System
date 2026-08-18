@@ -45,6 +45,7 @@ class ChatResponse(BaseModel):
     """The response and lifecycle state for this conversation turn."""
 
     message: str
+    messages: list[str] = Field(description="Customer-facing messages, in display order.")
     ticket_id: str | None = None
     session_id: str
     finished: bool
@@ -90,6 +91,7 @@ async def chat(
 
     return ChatResponse(
         message=result.message,
+        messages=result.messages or ([result.message] if result.message else []),
         ticket_id=result.ticket_id,
         session_id=conversation_id,
         finished=result.finished,

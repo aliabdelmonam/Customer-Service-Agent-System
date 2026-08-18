@@ -42,7 +42,7 @@ Explicitly NOT included yet (matches decisions made earlier in this build):
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from src.llm_providers import GenerationClient
@@ -75,6 +75,7 @@ class TurnResult:
     message: str
     ticket_id: Optional[str]
     finished: bool  # True if no ticket is active after this turn
+    messages: list[str] = field(default_factory=list)
 
 
 class Orchestrator:
@@ -104,7 +105,8 @@ class Orchestrator:
         triage_result = await self.triage.classify(message)
 
         if not triage_result.has_actionable_request:
-            return TurnResult(message=triage_result.canned_response(), ticket_id=None, finished=True)
+            message = triage_result.canned_response()
+            return TurnResult(message=message, ticket_id=None, finished=True, messages=[message])
 
         if triage_result.needs_clarification or triage_result.flow is None or triage_result.subflow is None:
             # TODO: replace with a proper narrow phrasing call, same pattern
@@ -113,6 +115,7 @@ class Orchestrator:
                 message="Could you tell me a bit more about what you need help with?",
                 ticket_id=None,
                 finished=True,
+                messages=["Could you tell me a bit more about what you need help with?"],
             )
 
         try:
@@ -122,6 +125,7 @@ class Orchestrator:
                 message="I need a person to help with that one -- I'm passing this along.",
                 ticket_id=None,
                 finished=True,
+                messages=["I need a person to help with that one -- I'm passing this along."],
             )
 
         state = TicketState.start(flow=triage_result.flow, subflow=triage_result.subflow, sequence=sequence)
@@ -139,27 +143,36 @@ class Orchestrator:
 
         if outcome.outcome_type in (OutcomeType.ASK_CUSTOMER, OutcomeType.INFORM_CUSTOMER):
             self._active_tickets[user_id] = (state, sequence)
-            return TurnResult(message=outcome.message or "", ticket_id=state.correlation_id, finished=False)
+            messages = outcome.messages or ([outcome.message] if outcome.message else [])
+            return TurnResult(
+                message=outcome.message or "",
+                ticket_id=state.correlation_id,
+                finished=False,
+                messages=messages,
+            )
 
         if outcome.outcome_type == OutcomeType.COMPLETED:
             self._active_tickets.pop(user_id, None)
+            message = outcome.message or "All set!"
             return TurnResult(
-                message=outcome.message or "All set!", ticket_id=state.correlation_id, finished=True
+                message=message,
+                ticket_id=state.correlation_id,
+                finished=True,
+                messages=outcome.messages or [message],
             )
 
         if outcome.outcome_type == OutcomeType.HANDOFF_APPROVAL:
             # No resumption path yet -- see module docstring TODO.
             self._active_tickets.pop(user_id, None)
-            return TurnResult(
-                message=outcome.message or "This needs a bit more review.",
-                ticket_id=state.correlation_id,
-                finished=True,
-            )
+            message = outcome.message or "This needs a bit more review."
+            return TurnResult(message=message, ticket_id=state.correlation_id, finished=True, messages=[message])
 
         if outcome.outcome_type == OutcomeType.HANDOFF_ESCALATION:
             self._active_tickets.pop(user_id, None)
             _payload, message = await self.escalation.handle(state, outcome, emotion=None)
-            return TurnResult(message=message, ticket_id=state.correlation_id, finished=True)
+            return TurnResult(
+                message=message, ticket_id=state.correlation_id, finished=True, messages=[message]
+            )
 
         raise ValueError(f"Unhandled outcome type {outcome.outcome_type!r}")
 
