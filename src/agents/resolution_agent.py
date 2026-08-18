@@ -58,6 +58,10 @@ class StepType(str, Enum):
 class CheckOperator(str, Enum):
     EQUALS = "equals"
     NOT_EQUALS = "not_equals"
+    IN = "in"
+    NOT_IN = "not_in"
+    LESS_THAN = "less_than"
+    GREATER_THAN = "greater_than"
     IS_TRUE = "is_true"
     IS_FALSE = "is_false"
     EXISTS = "exists"
@@ -470,6 +474,15 @@ class ResolutionAgent:
             return actual == expected
         if operator == CheckOperator.NOT_EQUALS:
             return actual != expected
+        if operator == CheckOperator.IN:
+            return isinstance(expected, (list, tuple, set, frozenset)) and actual in expected
+        if operator == CheckOperator.NOT_IN:
+            return isinstance(expected, (list, tuple, set, frozenset)) and actual not in expected
+        if operator in (CheckOperator.LESS_THAN, CheckOperator.GREATER_THAN):
+            actual_value, expected_value = ResolutionAgent._comparison_values(actual, expected)
+            if actual_value is None or expected_value is None:
+                return False
+            return actual_value < expected_value if operator == CheckOperator.LESS_THAN else actual_value > expected_value
         if operator == CheckOperator.IS_TRUE:
             return bool(actual) is True
         if operator == CheckOperator.IS_FALSE:
@@ -477,6 +490,19 @@ class ResolutionAgent:
         if operator == CheckOperator.EXISTS:
             return actual is not None
         raise ValueError(f"Unknown operator {operator!r}")
+
+    @staticmethod
+    def _comparison_values(actual: Any, expected: Any) -> tuple[Optional[float], Optional[float]]:
+        """Compare numbers and simple duration values such as ``"7_days"``."""
+        if isinstance(actual, (int, float)) and isinstance(expected, (int, float)):
+            return float(actual), float(expected)
+        if not isinstance(actual, str) or not isinstance(expected, str):
+            return None, None
+        actual_match = re.fullmatch(r"(-?\d+(?:\.\d+)?)_([a-zA-Z]+)", actual)
+        expected_match = re.fullmatch(r"(-?\d+(?:\.\d+)?)_([a-zA-Z]+)", expected)
+        if actual_match is None or expected_match is None or actual_match.group(2) != expected_match.group(2):
+            return None, None
+        return float(actual_match.group(1)), float(expected_match.group(1))
 
     async def _handle_action_step(
         self, state: TicketState, step: ActionStep
