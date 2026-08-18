@@ -43,6 +43,7 @@ Explicitly NOT included yet (matches decisions made earlier in this build):
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import logging
 from typing import Optional
 
 from src.llm_providers import GenerationClient
@@ -58,6 +59,9 @@ from src.agents.resolution_agent import (
 from src.agents.escalation_agent import EscalationAgent
 from src.agents.resolution_functions import FUNCTIONS
 from src.agents.sequence_loader import get_sequence, SequenceNotFoundError
+
+
+logger = logging.getLogger("customer_service.orchestrator")
 
 
 # ---------------------------------------------------------------------------
@@ -96,13 +100,24 @@ class Orchestrator:
 
     async def handle_message(self, user_id: str, message: str) -> TurnResult:
         active = self._active_tickets.get(user_id)
+        logger.info("customer_message user_id=%s message=%r has_active_ticket=%s", user_id, message, active is not None)
 
         if active is not None:
             state, sequence = active
+            logger.info("resume_ticket state=%s", state.snapshot())
             outcome = await self.resolution.process_turn(state, sequence, customer_message=message)
             return await self._handle_outcome(user_id, sequence, outcome)
 
         triage_result = await self.triage.classify(message)
+        logger.info(
+            "triage_result user_id=%s actionable=%s clarification=%s flow=%r subflow=%r confidence=%s",
+            user_id,
+            triage_result.has_actionable_request,
+            triage_result.needs_clarification,
+            triage_result.flow,
+            triage_result.subflow,
+            triage_result.confidence,
+        )
 
         if not triage_result.has_actionable_request:
             message = triage_result.canned_response()
@@ -121,6 +136,7 @@ class Orchestrator:
         try:
             sequence = get_sequence(triage_result.flow, triage_result.subflow)
         except SequenceNotFoundError:
+            logger.warning("sequence_not_found flow=%r subflow=%r", triage_result.flow, triage_result.subflow)
             return TurnResult(
                 message="I need a person to help with that one -- I'm passing this along.",
                 ticket_id=None,
@@ -130,6 +146,7 @@ class Orchestrator:
 
         state = TicketState.start(flow=triage_result.flow, subflow=triage_result.subflow, sequence=sequence)
         self._active_tickets[user_id] = (state, sequence)
+        logger.info("ticket_started state=%s", state.snapshot())
 
         # Same original message -- it may already contain the first slot's
         # value (e.g. "cancel order 4471" already has order_id).
@@ -140,6 +157,13 @@ class Orchestrator:
         self, user_id: str, sequence: StepSequence, outcome: ResolutionOutcome
     ) -> TurnResult:
         state = outcome.state
+        logger.info(
+            "resolution_outcome type=%s reason=%r state=%s messages=%s",
+            outcome.outcome_type.value,
+            outcome.reason,
+            state.snapshot(),
+            outcome.messages,
+        )
 
         if outcome.outcome_type in (OutcomeType.ASK_CUSTOMER, OutcomeType.INFORM_CUSTOMER):
             self._active_tickets[user_id] = (state, sequence)

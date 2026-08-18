@@ -27,6 +27,7 @@ the remaining 53 subflows — the shape (slot/check/action/response, per-slot
 from __future__ import annotations
 
 import json
+import logging
 import re
 import uuid
 from datetime import datetime, timezone
@@ -37,6 +38,9 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from src.llm_providers import GenerationClient, Message, ProviderError
 from src.agents.resolution_functions import FUNCTIONS, ResolutionFunction
+
+
+logger = logging.getLogger("customer_service.resolution")
 
 
 # ---------------------------------------------------------------------------
@@ -160,6 +164,18 @@ class TicketState(BaseModel):
     pending_action: Optional[str] = None
     escalation_reason: Optional[str] = None
 
+    def snapshot(self) -> dict[str, Any]:
+        """A compact state view for terminal logs, without the full audit history."""
+        return {
+            "correlation_id": self.correlation_id,
+            "flow": self.flow,
+            "subflow": self.subflow,
+            "current_step_id": self.current_step_id,
+            "status": self.status.value,
+            "filled_slots": self.filled_slots,
+            "pending_action": self.pending_action,
+        }
+
     def log(self, step_id: str, step_type: StepType, event: str, detail: str = "") -> None:
         self.audit_log.append(
             AuditEntry(
@@ -170,6 +186,10 @@ class TicketState(BaseModel):
                 event=event,
                 detail=detail,
             )
+        )
+        logger.info(
+            "ticket_event correlation_id=%s step=%s type=%s event=%s detail=%s state=%s",
+            self.correlation_id, step_id, step_type.value, event, detail, self.snapshot(),
         )
 
     @classmethod
@@ -233,8 +253,12 @@ class BackendFunctionRegistry:
                 function_name, RuntimeError(f"No backend function named '{function_name}'")
             )
         try:
-            return await function(dict(filled_slots))
+            logger.info("backend_function_start name=%s slots=%s", function_name, filled_slots)
+            result = await function(dict(filled_slots))
+            logger.info("backend_function_complete name=%s result=%r", function_name, result)
+            return result
         except Exception as exc:  # noqa: BLE001 -- always becomes an escalation
+            logger.exception("backend_function_failed name=%s", function_name)
             raise FunctionExecutionError(function_name, exc) from exc
 
 
@@ -350,6 +374,7 @@ class ResolutionAgent:
         approval gate, hits a backend-function failure, or finishes the sequence.
         """
         if state.status in (TicketStatus.COMPLETED, TicketStatus.ESCALATED):
+            logger.info("skip_terminal_ticket state=%s", state.snapshot())
             return ResolutionOutcome(outcome_type=OutcomeType.COMPLETED, state=state)
 
         state.status = TicketStatus.IN_PROGRESS
@@ -358,9 +383,14 @@ class ResolutionAgent:
         # Keep the full message available for the customer-facing response even
         # after its slot-extraction attempt has consumed it.
         turn_customer_message = customer_message
+        logger.info("process_turn customer_message=%r state=%s", customer_message, state.snapshot())
 
         for _ in range(max_steps_per_turn):
             step = sequence.get(state.current_step_id)
+            logger.info(
+                "processing_step correlation_id=%s step=%s type=%s",
+                state.correlation_id, step.step_id, step.step_type.value,
+            )
 
             if isinstance(step, SlotStep):
                 outcome = await self._handle_slot_step(state, step, pending_customer_message)

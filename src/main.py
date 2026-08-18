@@ -4,12 +4,29 @@ Run locally with:
     uvicorn src.main:app --reload
 """
 
+import logging
 import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.v1.router import api_router
+
+
+def configure_logging() -> None:
+    """Configure readable lifecycle logs for local development and monitoring."""
+    level = getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper(), logging.INFO)
+    root_logger = logging.getLogger()
+    if not root_logger.handlers:
+        logging.basicConfig(
+            level=level,
+            format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+        )
+    root_logger.setLevel(level)
+    logging.getLogger("customer_service").setLevel(level)
+
+
+configure_logging()
 
 
 DEFAULT_CORS_ORIGINS = (
