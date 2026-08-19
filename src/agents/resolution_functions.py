@@ -1,11 +1,3 @@
-"""Temporary backend functions used by the resolution agent.
-
-Each function is deliberately small and deterministic.  Replace its return
-value with the real database, payment, shipping, FAQ, or notification logic
-when the backend services are connected.  Keeping one function per resolution
-action makes that replacement local and explicit.
-"""
-
 from __future__ import annotations
 
 from typing import Any, Awaitable, Callable
@@ -39,7 +31,7 @@ async def ask_the_oracle(slots: dict[str, Any]) -> FunctionResult:
 async def shipping_status(slots: dict[str, Any]) -> FunctionResult:
     # Replace with an order-service lookup. This scalar is intentionally
     # returned directly because CheckStep compares it to "not_shipped".
-    return "not_shipped"
+    return "shipped"
 
 
 async def update_account(slots: dict[str, Any]) -> FunctionResult:

@@ -1,25 +1,3 @@
-"""Escalation agent.
-
-Consumes a `ResolutionOutcome` with `outcome_type == HANDOFF_ESCALATION`
-(from resolution_agent.py) plus its `TicketState`, and turns it into a
-structured payload for a human -- not a free-text summary. Also phrases a
-short customer-facing message.
-
-Design choices, consistent with the rest of the project:
-- Reason classification and priority are deterministic code, not an LLM
-  judgment call. The resolution agent's escalation reasons are generated
-  by our own code in a small number of consistent shapes (see
-  FunctionExecutionError / _escalate call sites), so pattern-matching on
-  them is reliable -- this is not fuzzy text the LLM needs to interpret.
-- The LLM is used narrowly, once, only to phrase the customer-facing
-  message naturally. It never decides priority, category, or what to tell
-  the human team. If the LLM call fails, a fixed template is used instead
-  -- a customer in an escalation moment must always get a response.
-- Emotion is NOT computed here. Per resolution_agent's own docstring,
-  emotion scoring lives in the orchestrator, upstream of both agents. This
-  agent accepts an already-computed emotion dict as an optional input.
-"""
-
 from __future__ import annotations
 
 import re

@@ -1,29 +1,3 @@
-"""Resolution agent — deterministic step-walker over a subflow's step sequence.
-
-Design principle (matches the rule-engine / triage split used elsewhere in this
-project): the LLM never decides control flow. It is invoked narrowly, per step,
-for exactly two jobs:
-
-  1. Extracting a value from what the customer just said (slot steps where
-     source == "customer_provided").
-  2. Phrasing a question or response naturally (slot steps that need to ask,
-     and response steps).
-
-Everything else — which step we're on, whether a check passes, whether an
-action requires human approval, whether we advance/branch/stop — is plain
-code with an explicit pointer (`current_step_id`) into the sequence. This is
-the same principle as the rule engine: the LLM must never improvise on checks
-or actions.
-
-SCHEMA NOTE: `sequence_table_refined_examples.json` / `rule_engine_examples.json`
-were not available when this file was written — only their READMEs. The step
-schema below (step_id / next_step_id / on_true_step_id / on_false_step_id /
-requires_human_approval) is MY OWN convention to make branching and exits
-concrete. Reconcile field names with the real refined JSON when you convert
-the remaining 53 subflows — the shape (slot/check/action/response, per-slot
-`source`) matches the README; the exact branching field names may not.
-"""
-
 from __future__ import annotations
 
 import json
