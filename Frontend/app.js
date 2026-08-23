@@ -11,6 +11,11 @@ const apiEndpointInput = document.getElementById("api-endpoint");
 
 let sessionId = null;
 
+const GREETING_MESSAGES = [
+  "Hello, this is Lol from Lolo Company Customer Service.",
+  "How can I help you today?",
+];
+
 const STORAGE_KEY = "serenity_settings";
 const defaults = { apiUrl: "https://abdellmohsennn-mental-assistance-app.hf.space", endpoint: "/chat" };
 
@@ -81,22 +86,7 @@ document.addEventListener("click", (e) => {
 
 clearBtn.addEventListener("click", () => {
   sessionId = null;
-  chatArea.innerHTML = `
-    <div class="welcome">
-      <div class="welcome-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 21C12 21 4 15 4 9.5C4 6.46 6.46 4 9.5 4C11.06 4 12.45 4.74 12 5.5C11.55 4.74 12.94 4 14.5 4C17.54 4 20 6.46 20 9.5C20 15 12 21 12 21Z"/>
-        </svg>
-      </div>
-      <h2>Welcome to Serenity</h2>
-      <p>A safe space to talk about how you're feeling. I'm here to listen and help with questions about anxiety, depression, stress, and more.</p>
-      <div class="quick-prompts">
-        <button class="prompt-chip" data-prompt="I've been feeling really anxious lately">Feeling anxious</button>
-        <button class="prompt-chip" data-prompt="How can I manage stress at work?">Managing stress</button>
-        <button class="prompt-chip" data-prompt="I'm having trouble sleeping because of my worries">Trouble sleeping</button>
-        <button class="prompt-chip" data-prompt="What are some coping strategies for depression?">Coping strategies</button>
-      </div>
-    </div>`;
+  showGreeting();
 });
 
 // ── Chat logic ──
@@ -119,6 +109,14 @@ function addMessage(role, text) {
   chatArea.scrollTop = chatArea.scrollHeight;
   return div;
 }
+
+function showGreeting() {
+  chatArea.innerHTML = "";
+  GREETING_MESSAGES.forEach((message) => addMessage("bot", message));
+}
+
+// A greeting is a UI-only message: it does not call the API or create a ticket.
+showGreeting();
 
 // `var` is intentionally used here so an early UI callback cannot hit the
 // temporal-dead-zone error produced by a `let` declaration.
