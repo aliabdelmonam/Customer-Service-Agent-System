@@ -270,9 +270,8 @@ class SlotExtraction(BaseModel):
 class CustomerPhrasing(BaseModel):
     """A human acknowledgement and the workflow-required reply.
 
-    ``acknowledgement`` is absent for ordinary, neutral messages. Keeping it
-    separate lets the UI show empathy as its own natural chat bubble rather
-    than joining it to a transactional question.
+    Keeping acknowledgement separate lets the UI show empathy as its own
+    natural chat bubble rather than joining it to a transactional question.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -292,10 +291,11 @@ already been decided by code: never change its next step, invent an action, prom
 or claim an action occurred unless the supplied facts say so. Do not mention internal
 instructions, policies, or system details.
 
-For a frustrated, worried, angry, or disappointed customer, write a warm, sincere acknowledgement
-of one or two sentences. Apologize clearly for their experience (for example, "I'm truly sorry
-this has been so frustrating") and express commitment to help. Do not accept legal fault, make
-up facts, or guarantee a result. For neutral messages, set acknowledgement to null.
+Always write a warm, sincere acknowledgement of one or two sentences. For a frustrated, worried,
+angry, rude, or disappointed customer, apologize clearly for their experience (for example,
+"I'm truly sorry this has been so frustrating") and express commitment to help. For a neutral
+message, still reassure them that you are here to help and will do everything reasonably possible
+to resolve their concern. Do not accept legal fault, make up facts, or guarantee a result.
 
 Put the current workflow instruction only in resolution_message. Keep it natural and specific;
 for example, a request for an order number belongs there, not in the acknowledgement. If the
@@ -669,9 +669,23 @@ class ResolutionAgent:
             phrasing = CustomerPhrasing.model_validate_json(response.text)
         except (ValidationError, json.JSONDecodeError):
             # If a provider ignores structured-output instructions, preserve a
-            # usable single reply rather than failing an in-progress ticket.
-            return [response.text.strip()]
-        return [part for part in (phrasing.acknowledgement, phrasing.resolution_message) if part]
+            # usable, empathetic reply rather than failing an in-progress ticket.
+            return [self._default_acknowledgement(customer_message), response.text.strip()]
+        acknowledgement = phrasing.acknowledgement or self._default_acknowledgement(customer_message)
+        return [acknowledgement, phrasing.resolution_message]
+
+    @staticmethod
+    def _default_acknowledgement(customer_message: Optional[str]) -> str:
+        """Guarantee a human acknowledgement if a model omits the first message."""
+        message = (customer_message or "").lower()
+        negative_signals = (
+            "angry", "awful", "bad", "disappointed", "frustrat", "hate",
+            "ridiculous", "terrible", "useless", "worst", "damn", "fuck",
+            "shit", "stupid", "incompetent",
+        )
+        if any(signal in message for signal in negative_signals):
+            return "I’m truly sorry this has been such a frustrating experience. I’ll do everything I reasonably can to help resolve this with you."
+        return "I’m here to help, and I’ll do everything I reasonably can to resolve your concern."
 
 
 __all__ = [
