@@ -10,6 +10,7 @@ A Python/FastAPI customer-service assistant that routes a customer message throu
 - Separates empathetic acknowledgements from the next required resolution step, allowing the UI to show them as separate chat bubbles.
 - Escalates failed or unsupported workflows with a structured handoff payload.
 - Exposes a browser-ready FastAPI chat endpoint with CORS support and terminal lifecycle logging.
+- Supports voice messages: browser microphone audio is transcribed to text before entering the normal chat flow.
 
 ## Architecture
 
@@ -22,6 +23,7 @@ FastAPI API
 Orchestrator
   ├─ TriageAgent       → chooses flow + subflow
   ├─ SequenceLoader    → loads the matching workflow from JSON
+  ├─ ASR Service       → transcribes microphone audio with Groq Whisper
   ├─ ResolutionAgent   → executes the current workflow step deterministically
   │    └─ BackendFunctionRegistry → calls backend functions
   └─ EscalationAgent   → prepares a structured human handoff on failure
@@ -115,6 +117,21 @@ Example response:
 
 Store and send back `session_id` on later requests so the in-memory workflow can continue. The frontend should render each entry in `messages` as its own bot message.
 
+### Speech-to-text
+
+```http
+POST /api/v1/asr/transcribe
+Content-Type: multipart/form-data
+```
+
+Send an `audio` field containing a browser-recorded audio file. The endpoint returns:
+
+```json
+{ "text": "I want to cancel my order" }
+```
+
+The bundled frontend microphone button records WebM audio, transcribes it, and automatically sends the resulting text to `/api/v1/chat`.
+
 ## Configuration
 
 Copy `.env.example` to `.env` at the repository root and configure a provider:
@@ -162,6 +179,7 @@ customer service agent system/
 ├─ Frontend/
 └─ src/
    ├─ main.py                         # FastAPI application and CORS/logging setup
+   ├─ asr_service.py                  # Groq Whisper speech-to-text component
    ├─ api/v1/endpoints/
    │  ├─ health.py                    # Health endpoint
    │  └─ chat.py                      # Chat endpoint
