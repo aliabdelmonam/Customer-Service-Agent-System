@@ -1,6 +1,7 @@
 const chatArea = document.getElementById("chat-area");
 const input = document.getElementById("message-input");
 const sendBtn = document.getElementById("send-btn");
+const micBtn = document.getElementById("mic-btn");
 const settingsBtn = document.getElementById("settings-btn");
 const settingsPanel = document.getElementById("settings-panel");
 const settingsSave = document.getElementById("settings-save");
@@ -10,6 +11,9 @@ const apiUrlInput = document.getElementById("api-url");
 const apiEndpointInput = document.getElementById("api-endpoint");
 
 let sessionId = null;
+let mediaRecorder = null;
+let microphoneStream = null;
+let recordedChunks = [];
 
 const GREETING_MESSAGES = [
   "Hello, this is Lol from Lolo Company Customer Service.",
@@ -17,7 +21,7 @@ const GREETING_MESSAGES = [
 ];
 
 const STORAGE_KEY = "serenity_settings";
-const defaults = { apiUrl: "https://abdellmohsennn-mental-assistance-app.hf.space", endpoint: "/chat" };
+const defaults = { apiUrl: "http://localhost:8000", endpoint: "/api/v1/chat" };
 
 function loadSettings() {
   try {
@@ -71,6 +75,7 @@ input.addEventListener("keydown", (e) => {
 });
 
 sendBtn.addEventListener("click", send);
+micBtn.addEventListener("click", toggleRecording);
 
 // ── Quick prompts ──
 
@@ -117,6 +122,73 @@ function showGreeting() {
 
 // A greeting is a UI-only message: it does not call the API or create a ticket.
 showGreeting();
+
+function setRecordingState(recording) {
+  micBtn.classList.toggle("recording", recording);
+  micBtn.title = recording ? "Stop and send voice message" : "Start voice message";
+  micBtn.setAttribute("aria-label", micBtn.title);
+}
+
+async function toggleRecording() {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    mediaRecorder.stop();
+    return;
+  }
+
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+    addError("Voice messages are not supported by this browser.");
+    return;
+  }
+
+  try {
+    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(microphoneStream);
+    mediaRecorder.addEventListener("dataavailable", (event) => {
+      if (event.data.size > 0) recordedChunks.push(event.data);
+    });
+    mediaRecorder.addEventListener("stop", transcribeRecording, { once: true });
+    mediaRecorder.start();
+    setRecordingState(true);
+  } catch (error) {
+    addError("Microphone access was not granted. Please allow microphone access and try again.");
+  }
+}
+
+async function transcribeRecording() {
+  setRecordingState(false);
+  microphoneStream?.getTracks().forEach((track) => track.stop());
+  microphoneStream = null;
+
+  const audio = new Blob(recordedChunks, { type: mediaRecorder?.mimeType || "audio/webm" });
+  mediaRecorder = null;
+  if (!audio.size) {
+    addError("No audio was recorded. Please try again.");
+    return;
+  }
+
+  showTyping();
+  try {
+    const formData = new FormData();
+    formData.append("audio", audio, "voice-message.webm");
+    const response = await fetch(`${settings.apiUrl}/api/v1/asr/transcribe`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error(`Speech recognition returned ${response.status}.`);
+    }
+    const { text } = await response.json();
+    if (!text?.trim()) throw new Error("No speech was recognized.");
+    input.value = text.trim();
+    input.dispatchEvent(new Event("input"));
+    hideTyping();
+    await send();
+  } catch (error) {
+    hideTyping();
+    addError(error.message || "Voice transcription failed. Please try again.");
+  }
+}
 
 // `var` is intentionally used here so an early UI callback cannot hit the
 // temporal-dead-zone error produced by a `let` declaration.

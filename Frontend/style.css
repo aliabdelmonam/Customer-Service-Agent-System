@@ -451,7 +451,8 @@ textarea::placeholder {
   color: var(--text-secondary);
 }
 
-.btn-send {
+.btn-send,
+.btn-mic {
   width: 36px;
   height: 36px;
   border: none;
@@ -473,6 +474,26 @@ textarea::placeholder {
 .btn-send:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.btn-mic {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-mic:hover:not(:disabled) {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.btn-mic.recording {
+  background: #dc2626;
+  color: #fff;
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  50% { transform: scale(1.08); }
 }
 
 .disclaimer {
